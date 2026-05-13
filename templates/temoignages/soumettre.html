@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block titre %}Témoignage — CamerAlert{% endblock %}
+
+{% block contenu %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="form-card text-center animate-in">
+                <div class="auth-icon" style="background:var(--vert-clair);color:var(--vert-fonce)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-chat-left-quote-fill" viewBox="0 0 16 16">
+                      <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2zm7.194 2.766a1.688 1.688 0 0 0-.227-.272 1.467 1.467 0 0 0-.469-.324l-.008-.004A1.785 1.785 0 0 0 5.734 2C4.776 2 4 2.749 4 3.667c0 .92.776 1.666 1.734 1.666.343 0 .662-.095.931-.26-.137.389-.39.804-.81 1.22a.405.405 0 0 0 .011.59c.173.16.447.155.614-.01 1.334-1.329 1.37-2.758.941-3.706a2.461 2.461 0 0 0-.227-.4zM11 2c-.958 0-1.734.749-1.734 1.667 0 .92.776 1.666 1.734 1.666.343 0 .662-.095.931-.26-.137.389-.39.804-.81 1.22a.405.405 0 0 0 .011.59c.173.16.447.155.614-.01 1.334-1.329 1.37-2.758.941-3.706a2.461 2.461 0 0 0-.227-.4 1.688 1.688 0 0 0-.227-.272 1.467 1.467 0 0 0-.469-.324l-.008-.004A1.785 1.785 0 0 0 11 2z"/>
+                    </svg>
+                </div>
+                <h4 class="fw-semibold mb-1">Soumettre un témoignage</h4>
+                <p class="text-muted small mb-4">
+                    Concernant : <strong>{{ personne.prenom }} {{ personne.nom }}</strong>
+                </p>
+                <form method="POST" class="text-start">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button class="btn btn-danger w-100 mt-2 py-2">
+                        Envoyer le témoignage
+                    </button>
+                </form>
+                <div class="mt-4 small">
+                    <a href="{% url 'detail_cas' personne.pk %}" class="text-muted text-decoration-none">
+                        ← Retour au cas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

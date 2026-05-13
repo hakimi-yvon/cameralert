@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Arial', sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        .wrapper { max-width: 580px; margin: 30px auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .header { background: #198754; padding: 28px 30px; text-align: center; }
+        .header h1 { color: #fff; margin: 0; font-size: 22px; letter-spacing: 1px; }
+        .header p { color: rgba(255,255,255,0.85); margin: 6px 0 0; font-size: 13px; }
+        .body { padding: 30px; color: #333; line-height: 1.6; }
+        .badge { display: inline-block; background: #198754; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-bottom: 18px; }
+        .big-icon { font-size: 56px; text-align: center; margin: 10px 0 20px; }
+        .info-box { background: #f0fdf4; border-left: 4px solid #198754; border-radius: 6px; padding: 14px 18px; margin: 18px 0; }
+        .info-box p { margin: 4px 0; font-size: 14px; }
+        .btn { display: inline-block; background: #198754; color: #fff !important; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; margin-top: 14px; }
+        .footer { background: #f8f9fa; text-align: center; padding: 16px; font-size: 12px; color: #888; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <h1>🔴 CamerAlert</h1>
+        <p>Plateforme nationale de signalement des personnes disparues</p>
+    </div>
+    <div class="body">
+        <div class="big-icon">🎉</div>
+        <p>Bonjour <strong>{{ prenom_declarant }}</strong>,</p>
+        <div class="badge">✓ Personne retrouvée !</div>
+        <p>
+            Nous avons l'immense joie de vous informer que
+            <strong>{{ cas.prenom }} {{ cas.nom }}</strong> a été
+            <strong>retrouvé(e)</strong> ! Son statut sur la plateforme CamerAlert
+            a été mis à jour.
+        </p>
+        <div class="info-box">
+            <p><strong>Nom :</strong> {{ cas.prenom }} {{ cas.nom }}</p>
+            <p><strong>Référence :</strong> {{ cas.reference }}</p>
+            <p><strong>Région :</strong> {{ cas.region }}</p>
+            <p><strong>Date de disparition :</strong> {{ cas.date_disparition }}</p>
+        </div>
+        <p>
+            Merci d'avoir utilisé CamerAlert pour signaler cette disparition.
+            Votre action a contribué à retrouver cette personne.
+            Nous vous souhaitons tout le bonheur possible à vous et à votre famille.
+        </p>
+        <a href="{{ url_cas }}" class="btn">Voir la fiche →</a>
+        <p style="margin-top:20px; font-size:13px; color:#666;">
+            N'hésitez pas à partager CamerAlert autour de vous pour aider d'autres familles.
+        </p>
+    </div>
+    <div class="footer">
+        © CamerAlert — Plateforme nationale de signalement de personnes disparues au Cameroun<br>
+        Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+    </div>
+</div>
+</body>
+</html>

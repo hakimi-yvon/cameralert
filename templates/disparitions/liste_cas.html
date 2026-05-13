@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block titre %}Tous les cas — CamerAlert{% endblock %}
+
+{% block contenu %}
+<div class="container py-4">
+    <h2 class="fw-semibold mb-4">Tous les cas</h2>
+
+    <!-- Filtres -->
+    <form method="GET" class="d-flex gap-2 flex-wrap mb-4">
+        <input type="text" name="q" value="{{ recherche|default:'' }}"
+               class="form-control w-auto" placeholder="Rechercher...">
+        <select name="region" class="form-select w-auto">
+            <option value="">Toutes les régions</option>
+            <option value="Centre" {% if region == 'Centre' %}selected{% endif %}>Centre</option>
+            <option value="Littoral" {% if region == 'Littoral' %}selected{% endif %}>Littoral</option>
+            <option value="Nord" {% if region == 'Nord' %}selected{% endif %}>Nord</option>
+            <option value="Extrême-Nord" {% if region == 'Extrême-Nord' %}selected{% endif %}>Extrême-Nord</option>
+            <option value="Ouest" {% if region == 'Ouest' %}selected{% endif %}>Ouest</option>
+            <option value="Sud" {% if region == 'Sud' %}selected{% endif %}>Sud</option>
+            <option value="Est" {% if region == 'Est' %}selected{% endif %}>Est</option>
+            <option value="Adamaoua" {% if region == 'Adamaoua' %}selected{% endif %}>Adamaoua</option>
+            <option value="Nord-Ouest" {% if region == 'Nord-Ouest' %}selected{% endif %}>Nord-Ouest</option>
+            <option value="Sud-Ouest" {% if region == 'Sud-Ouest' %}selected{% endif %}>Sud-Ouest</option>
+        </select>
+        <select name="categorie" class="form-select w-auto">
+            <option value="">Toutes catégories</option>
+            <option value="enfant">Enfants</option>
+            <option value="femme">Femmes</option>
+            <option value="homme">Hommes</option>
+            <option value="personne_agee">Personnes âgées</option>
+        </select>
+        <!-- Tri par date -->
+        <select name="tri" class="form-select w-auto">
+            <option value="recent" {% if tri == 'recent' or not tri %}selected{% endif %}>Plus récent d'abord</option>
+            <option value="ancien" {% if tri == 'ancien' %}selected{% endif %}>Plus ancien d'abord</option>
+        </select>
+        <!-- Filtre ancienneté -->
+        <select name="anciennete" class="form-select w-auto">
+            <option value="">Toutes les dates</option>
+            <option value="moins_30" {% if anciennete == 'moins_30' %}selected{% endif %}>Disparu depuis &lt; 30 jours</option>
+            <option value="plus_30" {% if anciennete == 'plus_30' %}selected{% endif %}>Disparu depuis &gt; 30 jours</option>
+            <option value="plus_90" {% if anciennete == 'plus_90' %}selected{% endif %}>Disparu depuis &gt; 90 jours</option>
+        </select>
+        <button class="btn btn-danger">Filtrer</button>
+        <a href="{% url 'liste_cas' %}" class="btn btn-outline-secondary">
+            Réinitialiser
+        </a>
+    </form>
+
+    <!-- Grille -->
+    <div class="row g-3">
+        {% for cas in cas %}
+        <div class="col-md-3">
+            <a href="{% url 'detail_cas' cas.pk %}" class="text-decoration-none">
+                <div class="card card-disparu h-100 shadow-sm">
+                    {% if cas.photo %}
+                        <img src="{{ cas.photo.url }}" class="card-img-top"
+                             style="height:140px; object-fit:cover;">
+                    {% else %}
+                        <div class="bg-secondary bg-opacity-10 d-flex align-items-center 
+                                    justify-content-center" style="height:140px;">
+                            <span class="text-muted fw-semibold fs-3">
+                                {{ cas.prenom|first }}{{ cas.nom|first }}
+                            </span>
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="fw-semibold text-dark">
+                            {{ cas.prenom }} {{ cas.nom }}
+                        </div>
+                        <div class="text-muted small">
+                            {{ cas.age }} ans · {{ cas.get_sexe_display }}
+                        </div>
+                        <div class="text-muted small">{{ cas.region }}</div>
+                        <div class="text-muted small">
+                            Disparu(e) le {{ cas.date_disparition }}
+                        </div>
+                        <span class="badge badge-urgent mt-2" style="font-size:10px;">
+                            Urgent
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+            <p class="text-muted">Aucun cas ne correspond à votre recherche.</p>
+        {% endfor %}
+    </div>
+</div>
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="d-flex justify-content-center mt-4">
+    <nav>
+        <ul class="pagination">
+
+            <!-- Bouton précédent -->
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link text-danger" 
+                       href="?page={{ page_obj.previous_page_number }}{% if recherche %}&q={{ recherche }}{% endif %}{% if region %}&region={{ region }}{% endif %}{% if categorie %}&categorie={{ categorie }}{% endif %}{% if tri %}&tri={{ tri }}{% endif %}{% if anciennete %}&anciennete={{ anciennete }}{% endif %}">
+                        ←
+                    </a>
+                </li>
+            {% endif %}
+
+            <!-- Numéros de pages -->
+            {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link {% if page_obj.number != num %}text-danger{% endif %}"
+                       href="?page={{ num }}{% if recherche %}&q={{ recherche }}{% endif %}{% if region %}&region={{ region }}{% endif %}{% if categorie %}&categorie={{ categorie }}{% endif %}{% if tri %}&tri={{ tri }}{% endif %}{% if anciennete %}&anciennete={{ anciennete }}{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+            {% endfor %}
+
+            <!-- Bouton suivant -->
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link text-danger"
+                       href="?page={{ page_obj.next_page_number }}{% if recherche %}&q={{ recherche }}{% endif %}{% if region %}&region={{ region }}{% endif %}{% if categorie %}&categorie={{ categorie }}{% endif %}{% if tri %}&tri={{ tri }}{% endif %}{% if anciennete %}&anciennete={{ anciennete }}{% endif %}">
+                        →
+                    </a>
+                </li>
+            {% endif %}
+
+        </ul>
+    </nav>
+</div>
+{% endif %}
+{% endblock %}

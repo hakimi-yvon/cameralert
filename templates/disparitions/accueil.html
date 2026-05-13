@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block titre %}Accueil — CamerAlert{% endblock %}
+
+{% block contenu %}
+
+<!-- Hero section -->
+<div class="hero-section">
+    <div class="container text-center">
+        <h1>Aide à retrouver les disparus<br>du Cameroun</h1>
+        <p>
+            Signalez, recherchez et retrouvez les personnes 
+            disparues partout au Cameroun.
+        </p>
+
+        <form action="{% url 'liste_cas' %}" method="GET" 
+              class="search-wrapper">
+            <input type="text" name="q"
+                   class="form-control"
+                   placeholder="Nom, prénom, région...">
+            <button class="btn btn-danger px-4">
+                Rechercher
+            </button>
+        </form>
+
+        <div class="stats-hero">
+            <div class="stat-item">
+                <div class="stat-number">{{ total_actifs }}</div>
+                <div class="stat-label">Cas actifs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ total_retrouves }}</div>
+                <div class="stat-label">Retrouvées</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">10</div>
+                <div class="stat-label">Régions</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cas récents -->
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <div class="section-title">Cas récents</div>
+            <div class="section-subtitle">
+                Les derniers signalements publiés sur la plateforme
+            </div>
+        </div>
+        <a href="{% url 'liste_cas' %}" 
+           class="btn btn-outline-danger btn-sm">
+            Voir tous →
+        </a>
+    </div>
+
+    <div class="row g-3">
+        {% for cas in cas_recents %}
+        <div class="col-6 col-md-4 col-lg-2 animate-in">
+            <a href="{% url 'detail_cas' cas.pk %}" 
+               class="text-decoration-none">
+                <div class="card card-disparu h-100">
+                    {% if cas.photo %}
+                        <div style="overflow:hidden; height:160px;">
+                            <img src="{{ cas.photo.url }}"
+                                 class="card-img-top w-100 h-100"
+                                 style="object-fit:cover;">
+                        </div>
+                    {% else %}
+                        <div class="avatar-initiales">
+                            {{ cas.prenom|first }}{{ cas.nom|first }}
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="card-name">
+                            {{ cas.prenom }} {{ cas.nom }}
+                        </div>
+                        <div class="card-meta">
+                            {{ cas.age }} ans · {{ cas.region }}
+                        </div>
+                        <div class="card-meta">
+                            {{ cas.date_disparition }}
+                        </div>
+                        <span class="badge-urgent mt-2 d-inline-block">
+                            Urgent
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-muted text-center py-4">
+                Aucun cas publié pour le moment.
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

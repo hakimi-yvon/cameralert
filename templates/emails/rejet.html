@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Arial', sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        .wrapper { max-width: 580px; margin: 30px auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .header { background: #dc3545; padding: 28px 30px; text-align: center; }
+        .header h1 { color: #fff; margin: 0; font-size: 22px; letter-spacing: 1px; }
+        .header p { color: rgba(255,255,255,0.85); margin: 6px 0 0; font-size: 13px; }
+        .body { padding: 30px; color: #333; line-height: 1.6; }
+        .badge { display: inline-block; background: #6c757d; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-bottom: 18px; }
+        .info-box { background: #f8f9fa; border-left: 4px solid #6c757d; border-radius: 6px; padding: 14px 18px; margin: 18px 0; }
+        .info-box p { margin: 4px 0; font-size: 14px; }
+        .btn { display: inline-block; background: #dc3545; color: #fff !important; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; margin-top: 14px; }
+        .footer { background: #f8f9fa; text-align: center; padding: 16px; font-size: 12px; color: #888; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <h1>🔴 CamerAlert</h1>
+        <p>Plateforme nationale de signalement des personnes disparues</p>
+    </div>
+    <div class="body">
+        <p>Bonjour <strong>{{ prenom_declarant }}</strong>,</p>
+        <div class="badge">⚠ Signalement non publié</div>
+        <p>
+            Nous vous informons que votre signalement concernant
+            <strong>{{ cas.prenom }} {{ cas.nom }}</strong> n'a pas pu être publié suite à l'examen
+            de notre équipe de modération.
+        </p>
+        <div class="info-box">
+            <p><strong>Nom :</strong> {{ cas.prenom }} {{ cas.nom }}</p>
+            <p><strong>Référence :</strong> {{ cas.reference }}</p>
+            <p><strong>Région :</strong> {{ cas.region }}</p>
+            <p><strong>Date de disparition :</strong> {{ cas.date_disparition }}</p>
+        </div>
+        <p>
+            Les raisons possibles pour un refus de publication incluent :
+        </p>
+        <ul style="color:#555; font-size:14px;">
+            <li>Informations insuffisantes ou incomplètes</li>
+            <li>Contenu ne respectant pas les conditions d'utilisation</li>
+            <li>Signalement en doublon avec un cas existant</li>
+        </ul>
+        <p>
+            Si vous pensez que cette décision est une erreur, vous pouvez soumettre
+            un nouveau signalement avec des informations complémentaires, ou nous contacter.
+        </p>
+        <a href="{% url 'signaler' %}" class="btn">Soumettre un nouveau signalement →</a>
+    </div>
+    <div class="footer">
+        © CamerAlert — Plateforme nationale de signalement de personnes disparues au Cameroun<br>
+        Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+    </div>
+</div>
+</body>
+</html>

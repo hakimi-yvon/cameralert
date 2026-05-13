@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block titre %}Carte des disparitions — CamerAlert{% endblock %}
+
+{% block contenu %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <div>
+            <h2 class="fw-semibold mb-0">Carte des disparitions</h2>
+            <p class="text-muted small mb-0">Visualisation géographique des cas actifs au Cameroun</p>
+        </div>
+        <div class="d-flex gap-3">
+            <div class="text-center">
+                <div class="fw-bold fs-4 text-danger">{{ total_actifs }}</div>
+                <div class="text-muted small">Cas actifs</div>
+            </div>
+            <div class="text-center">
+                <div class="fw-bold fs-4 text-success">{{ total_retrouves }}</div>
+                <div class="text-muted small">Retrouvées</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carte -->
+    <div class="card shadow-sm mb-4" style="border-radius:12px; overflow:hidden;">
+        <div id="carte-cameroun" style="height: 520px; width: 100%;"></div>
+    </div>
+
+    <!-- Légende -->
+    <div class="card shadow-sm p-3">
+        <div class="fw-semibold mb-2">Légende</div>
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <div style="width:18px;height:18px;border-radius:50%;background:#dc3545;opacity:0.85;"></div>
+                <span class="small">1–2 cas</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <div style="width:24px;height:24px;border-radius:50%;background:#dc3545;opacity:0.85;"></div>
+                <span class="small">3–5 cas</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <div style="width:32px;height:32px;border-radius:50%;background:#dc3545;opacity:0.85;"></div>
+                <span class="small">6+ cas</span>
+            </div>
+            <span class="text-muted small ms-2">Cliquez sur un cercle pour voir les détails et filtrer les cas</span>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    // Initialisation de la carte centrée sur le Cameroun
+    const map = L.map('carte-cameroun', {
+        center: [5.5, 12.3],
+        zoom: 6,
+        zoomControl: true,
+    });
+
+    // Fond de carte CartoDB Positron (élégant, clair, gratuit)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 18,
+    }).addTo(map);
+
+    // Données des régions injectées depuis Django
+    const markers = {{ markers_json|safe }};
+
+    // Rayon du cercle selon le nombre de cas
+    function getRadius(total) {
+        if (total >= 10) return 40000;
+        if (total >= 6)  return 32000;
+        if (total >= 3)  return 24000;
+        return 16000;
+    }
+
+    // Opacité selon l'urgence
+    function getOpacity(total) {
+        if (total >= 6) return 0.90;
+        if (total >= 3) return 0.75;
+        return 0.60;
+    }
+
+    markers.forEach(function(m) {
+        const circle = L.circle([m.lat, m.lng], {
+            color: '#dc3545',
+            fillColor: '#dc3545',
+            fillOpacity: getOpacity(m.total),
+            weight: 2,
+            radius: getRadius(m.total),
+        }).addTo(map);
+
+        // Popup au clic
+        const url = `/cas/?region=${encodeURIComponent(m.region)}`;
+        circle.bindPopup(`
+            <div style="text-align:center; min-width:140px;">
+                <strong style="font-size:15px;">${m.region}</strong><br>
+                <span style="font-size:22px; font-weight:700; color:#dc3545;">${m.total}</span><br>
+                <span style="color:#666; font-size:12px;">cas actif${m.total > 1 ? 's' : ''}</span><br>
+                <a href="${url}"
+                   style="display:inline-block; margin-top:8px; padding:4px 12px;
+                          background:#dc3545; color:#fff; border-radius:6px;
+                          text-decoration:none; font-size:12px;">
+                    Voir les cas →
+                </a>
+            </div>
+        `);
+
+        // Tooltip au survol
+        circle.bindTooltip(`<b>${m.region}</b> — ${m.total} cas`, {
+            permanent: false,
+            direction: 'top',
+        });
+    });
+
+    // Si aucune région avec des cas, afficher un message
+    if (markers.length === 0) {
+        L.popup()
+            .setLatLng([5.5, 12.3])
+            .setContent('<div style="text-align:center">Aucun cas actif pour le moment</div>')
+            .openOn(map);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord — CamerAlert Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v={% now 'U' %}"></head>
+<body>
+
+<div class="layout">
+
+    <!-- Barre latérale -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-dot"></span>
+            <span class="logo-text">CamerAlert</span>
+            <span class="logo-badge">Admin</span>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Principal</div>
+            <a href="{% url 'dashboard' %}" class="nav-item active">
+                <span class="nav-dot"></span>Tableau de bord
+            </a>
+            <a href="{% url 'dashboard' %}?filtre=en_attente" class="nav-item">
+                <span class="nav-dot"></span>Modération
+                {% if en_attente > 0 %}
+                    <span class="nav-count">{{ en_attente }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'liste_cas' %}" class="nav-item">
+                <span class="nav-dot"></span>Tous les cas
+                <span class="nav-count-gray">{{ total_actifs }}</span>
+            </a>
+            <a href="{% url 'admin:temoignages_temoignage_changelist' %}" class="nav-item">
+                <span class="nav-dot"></span>Témoignages
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Gestion</div>
+            <a href="{% url 'admin:auth_user_changelist' %}" class="nav-item">
+                <span class="nav-dot"></span>Utilisateurs
+            </a>
+            <a href="{% url 'admin:disparitions_personnedisparue_changelist' %}" class="nav-item">
+                <span class="nav-dot"></span>Cas résolus
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Système</div>
+            <a href="{% url 'admin:index' %}" class="nav-item">
+                <span class="nav-dot"></span>Administration
+            </a>
+            <a href="{% url 'deconnexion' %}" class="nav-item">
+                <span class="nav-dot"></span>Se déconnecter
+            </a>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="admin-info">
+                <div class="admin-avatar">
+                    {{ request.user.username|first|upper }}
+                </div>
+                <div>
+                    <div class="admin-name">{{ request.user.username }}</div>
+                    <div class="admin-role">Super admin</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zone principale -->
+    <div class="main">
+
+        <!-- Barre supérieure -->
+        <div class="topbar">
+            <div class="topbar-title">Tableau de bord</div>
+            <div class="topbar-right">
+    <button class="btn-theme-db" id="btn-theme-db" title="Changer le thème">
+        🌙
+    </button>
+    <a href="{% url 'accueil' %}" class="btn-export">
+        Voir le site
+    </a>
+</div>
+        </div>
+
+        <!-- Contenu -->
+        <div class="content">
+
+            <!-- Cartes statistiques -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Cas actifs</div>
+                    <div class="stat-num">{{ total_actifs }}</div>
+                    <div class="stat-trend trend-warn">En recherche</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">En attente de validation</div>
+                    <div class="stat-num warn">{{ en_attente }}</div>
+                    <div class="stat-trend trend-warn">À traiter</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Personnes retrouvées</div>
+                    <div class="stat-num success">{{ total_retrouves }}</div>
+                    <div class="stat-trend trend-up">Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Témoignages reçus</div>
+                    <div class="stat-num">{{ total_temoignages }}</div>
+                    <div class="stat-trend trend-up">Total</div>
+                </div>
+            </div>
+
+            <!-- Grille principale -->
+            <div class="main-grid">
+
+                <!-- Modération -->
+                <div class="moderation-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            Signalements en attente de modération
+                        </div>
+                    </div>
+
+                    {% for cas in cas_en_attente %}
+                    <div class="case-row">
+                        <div class="case-avatar">
+                            {{ cas.prenom|first }}{{ cas.nom|first }}
+                        </div>
+                        <div class="case-info">
+                            <div class="case-name">
+                                {{ cas.prenom }} {{ cas.nom }}
+                                <span class="badge badge-new">Nouveau</span>
+                            </div>
+                            <div class="case-meta">
+                                {{ cas.age }} ans · 
+                                {{ cas.get_categorie_display }} · 
+                                {{ cas.region }} · 
+                                Soumis le {{ cas.date_creation|date:"d/m/Y" }}
+                            </div>
+                            <div class="case-actions">
+                                <a href="{% url 'valider_cas' cas.pk %}" 
+                                   class="btn-approve">
+                                    Approuver
+                                </a>
+                                <a href="{% url 'rejeter_cas' cas.pk %}" 
+                                   class="btn-reject">
+                                    Rejeter
+                                </a>
+                                <a href="{% url 'detail_cas' cas.pk %}" 
+                                   class="btn-view">
+                                    Voir le détail
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-4 text-center empty-msg">
+                        Aucun cas en attente de validation.
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Colonne droite -->
+                <div class="right-col">
+
+                    <!-- Activité récente -->
+                    <div class="activity-card">
+                        <div class="card-header">
+                            <div class="card-title">Activité récente</div>
+                        </div>
+
+                        {% for t in temoignages_recents %}
+                        <div class="activity-item">
+                            <div class="act-dot act-dot-blue"></div>
+                            <div class="act-text">
+                                Nouveau témoignage sur 
+                                <strong>
+                                    {{ t.personne.prenom }} {{ t.personne.nom }}
+                                </strong>
+                            </div>
+                            <div class="act-time">
+                                {{ t.date_soumission|timesince }}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% for cas in cas_retrouves_recents %}
+                        <div class="activity-item">
+                            <div class="act-dot act-dot-green"></div>
+                            <div class="act-text">
+                                <strong>
+                                    {{ cas.prenom }} {{ cas.nom }}
+                                </strong> 
+                                marqué(e) comme retrouvé(e).
+                            </div>
+                            <div class="act-time">
+                                {{ cas.date_modification|timesince }}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% for cas in cas_recents_valides %}
+                        <div class="activity-item">
+                            <div class="act-dot act-dot-amber"></div>
+                            <div class="act-text">
+                                Nouveau signalement : 
+                                <strong>
+                                    {{ cas.prenom }} {{ cas.nom }}
+                                </strong>
+                            </div>
+                            <div class="act-time">
+                                {{ cas.date_creation|timesince }}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% if not temoignages_recents and not cas_retrouves_recents and not cas_recents_valides %}
+                        <div class="p-3 text-center empty-msg">
+                            Aucune activité récente.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Cas par région -->
+                    <div class="regions-card">
+                        <div class="card-header">
+                            <div class="card-title">Cas par région</div>
+                        </div>
+                        {% for r in regions %}
+                        <div class="region-row">
+                            <div class="region-name">{{ r.region }}</div>
+                            <div class="region-bar-wrap">
+                                <div class="region-bar" 
+                                     style="width:{% widthratio r.total max_region 100 %}%">
+                                </div>
+                            </div>
+                            <div class="region-count">{{ r.total }}</div>
+                        </div>
+                        {% empty %}
+                        <div class="p-3 text-center empty-msg">
+                            Aucune donnée.
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Synchronise le thème avec le site principal
+    const btnDb = document.getElementById('btn-theme-db');
+    const body = document.body;
+
+    // Lit la préférence sauvegardée
+    if (localStorage.getItem('theme') === 'dark') {
+        body.classList.add('dark-mode');
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
+        btnDb.textContent = '☀️';
+    } else {
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+    }
+
+    btnDb.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+            btnDb.textContent = '☀️';
+        } else {
+            localStorage.setItem('theme', 'light');
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+            btnDb.textContent = '🌙';
+        }
+    });
+</script>
+</body>
+</html>

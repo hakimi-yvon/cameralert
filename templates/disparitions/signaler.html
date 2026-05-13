@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block titre %}Signaler une disparition — CamerAlert{% endblock %}
+
+{% block contenu %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="form-card animate-in">
+                <div class="auth-icon" style="background:var(--rouge-clair); color:var(--rouge);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-megaphone-fill" viewBox="0 0 16 16">
+                      <path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0v-11zm-1 .724c-2.067.95-4.539 1.481-7 1.656v6.237a25.222 25.222 0 0 1 1.088.085c2.053.204 4.038.668 5.912 1.56V3.224zm-8 7.841V4.934c-.68.027-1.399.043-2.008.053A2.02 2.02 0 0 0 0 7v2c0 1.106.896 1.996 1.994 2.009a68.14 68.14 0 0 1 .496.008 64 64 0 0 1 1.51.048zm1.39 1.081c.285.021.569.047.85.078l.253 1.69a1.5 1.5 0 0 1-.986 1.687l-1.39.463c-.15.05-.316-.016-.395-.15l-.89-1.503a.5.5 0 0 1 .15-.658l1.458-1.077c.307-.227.65-.36 1.002-.387h.001z"/>
+                    </svg>
+                </div>
+                <h3 class="fw-semibold text-center mb-1">Signaler une disparition</h3>
+                <p class="text-muted text-center small mb-4">
+                    Veuillez fournir le maximum de détails précis pour faciliter les recherches de nos équipes.
+                </p>
+
+                <form method="POST" enctype="multipart/form-data" class="text-start">
+                    {% csrf_token %}
+
+                    <div class="form-section-title">1. Identité de la personne</div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.nom.label }}</label>
+                            {{ form.nom }}
+                            {% if form.nom.errors %}<div class="text-danger small mt-1">{{ form.nom.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.prenom.label }}</label>
+                            {{ form.prenom }}
+                            {% if form.prenom.errors %}<div class="text-danger small mt-1">{{ form.prenom.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ form.age.label }}</label>
+                            {{ form.age }}
+                            {% if form.age.errors %}<div class="text-danger small mt-1">{{ form.age.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ form.sexe.label }}</label>
+                            {{ form.sexe }}
+                            {% if form.sexe.errors %}<div class="text-danger small mt-1">{{ form.sexe.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ form.categorie.label }}</label>
+                            {{ form.categorie }}
+                            {% if form.categorie.errors %}<div class="text-danger small mt-1">{{ form.categorie.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">2. Apparence physique</div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.taille.label }}</label>
+                            {{ form.taille }}
+                            {% if form.taille.errors %}<div class="text-danger small mt-1">{{ form.taille.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.teint.label }}</label>
+                            {{ form.teint }}
+                            {% if form.teint.errors %}<div class="text-danger small mt-1">{{ form.teint.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">{{ form.signes_particuliers.label }}</label>
+                            {{ form.signes_particuliers }}
+                            {% if form.signes_particuliers.errors %}<div class="text-danger small mt-1">{{ form.signes_particuliers.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">{{ form.vetements.label }}</label>
+                            {{ form.vetements }}
+                            {% if form.vetements.errors %}<div class="text-danger small mt-1">{{ form.vetements.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">3. Circonstances de la disparition</div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.date_disparition.label }}</label>
+                            {{ form.date_disparition }}
+                            {% if form.date_disparition.errors %}<div class="text-danger small mt-1">{{ form.date_disparition.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.heure_disparition.label }}</label>
+                            {{ form.heure_disparition }}
+                            {% if form.heure_disparition.errors %}<div class="text-danger small mt-1">{{ form.heure_disparition.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.region.label }}</label>
+                            {{ form.region }}
+                            {% if form.region.errors %}<div class="text-danger small mt-1">{{ form.region.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.ville.label }}</label>
+                            {{ form.ville }}
+                            {% if form.ville.errors %}<div class="text-danger small mt-1">{{ form.ville.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">{{ form.description.label }}</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-12 mb-4">
+                            <label class="form-label">{{ form.photo.label }}</label>
+                            {{ form.photo }}
+                            <div class="form-text small">Format recommandé : JPG ou PNG. L'image doit être claire.</div>
+                            {% if form.photo.errors %}<div class="text-danger small mt-1">{{ form.photo.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button class="btn btn-danger w-100 py-3 mt-3 fw-bold" style="font-size:15px; border-radius: 12px !important;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-send-fill me-2 mb-1" viewBox="0 0 16 16">
+                          <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+                        </svg>
+                        Soumettre le signalement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
