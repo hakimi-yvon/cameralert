@@ -1,3 +1,4 @@
+
 """
 Django settings for cameralert project.
 
@@ -127,8 +128,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Fichiers statiques (CSS, JS, images)
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # ============================================================
 # Configuration Email
 # En développement : les emails s'affichent dans le terminal
@@ -150,5 +150,9 @@ DEFAULT_FROM_EMAIL = 'CamerAlert <noreply@cameralert.cm>'
 LOGIN_URL = 'connexion'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+ALLOWED_HOSTS = ["*"]
 
 
