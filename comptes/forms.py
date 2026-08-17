@@ -6,16 +6,19 @@ class InscriptionForm(UserCreationForm):
 
     # Champs supplémentaires
     email = forms.EmailField(
-        required=False,
-        label="Adresse email (optionnel)"
+        required=True,
+        label="Adresse email (nécessaire pour les notifications)",
+        help_text="Vous recevrez les alertes et le suivi de vos signalements."
     )
     first_name = forms.CharField(
         max_length=100,
-        label="Prénom"
+        label="Prénom",
+        required=True
     )
     last_name = forms.CharField(
         max_length=100,
-        label="Nom"
+        label="Nom",
+        required=True
     )
 
     class Meta:

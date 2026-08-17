@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.db.models import Count
 import json
@@ -101,8 +102,8 @@ def signaler(request):
             cas.save()
             messages.success(
                 request, 
-                'Votre signalement a été soumis. '
-                'Il sera publié après validation.'
+                'Votre signalement a été soumis avec succès. '
+                'Il sera publié après validation par notre équipe.'
             )
             return redirect('accueil')
     else:
@@ -156,16 +157,22 @@ def carte_disparitions(request):
         'total_retrouves': total_retrouves,
     })
 
-
 @login_required
 def marquer_retrouve(request, pk):
     cas = get_object_or_404(PersonneDisparue, pk=pk)
+    
+    # Seul l'administrateur ou le déclarant original peut marquer le cas comme retrouvé
+    if not (request.user.is_staff or cas.declarant == request.user):
+        messages.error(request, "Vous n'avez pas l'autorisation de modifier ce signalement.")
+        return redirect('detail_cas', pk=pk)
+
     cas.statut = 'retrouvee'
     cas.save()
     envoyer_email_retrouve(cas, request)
     messages.success(request, f'{cas.prenom} {cas.nom} a été marqué(e) comme retrouvé(e).')
     return redirect('detail_cas', pk=pk)
-@login_required
+
+@staff_member_required
 def valider_cas(request, pk):
     cas = get_object_or_404(PersonneDisparue, pk=pk)
     cas.statut = 'en_recherche'
@@ -177,7 +184,7 @@ def valider_cas(request, pk):
     )
     return redirect('dashboard')
 
-@login_required
+@staff_member_required
 def rejeter_cas(request, pk):
     cas = get_object_or_404(PersonneDisparue, pk=pk)
     cas.statut = 'rejete'

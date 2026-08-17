@@ -29,12 +29,17 @@ def tableau_de_bord(request):
         statut='en_attente'
     ).order_by('-date_creation')
 
+    # Témoignages en attente de modération
+    temoignages_en_attente = Temoignage.objects.filter(
+        est_valide=False
+    ).select_related('personne').order_by('-date_soumission')
+
     # Activité récente (dernières 24h)
     hier = timezone.now() - timedelta(hours=24)
 
     temoignages_recents = Temoignage.objects.filter(
         date_soumission__gte=hier
-    ).order_by('-date_soumission')[:5]
+    ).select_related('personne').order_by('-date_soumission')[:5]
 
     cas_recents_valides = PersonneDisparue.objects.filter(
         date_creation__gte=hier
@@ -62,6 +67,7 @@ def tableau_de_bord(request):
         'total_retrouves': total_retrouves,
         'total_temoignages': total_temoignages,
         'cas_en_attente': cas_en_attente,
+        'temoignages_en_attente': temoignages_en_attente,
         'temoignages_recents': temoignages_recents,
         'cas_recents_valides': cas_recents_valides,
         'cas_retrouves_recents': cas_retrouves_recents,

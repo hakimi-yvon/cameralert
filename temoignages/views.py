@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from disparitions.models import PersonneDisparue
 from .models import Temoignage
 from .forms import TemoignageForm
@@ -26,3 +27,18 @@ def soumettre(request, personne_id):
         'form': form,
         'personne': personne
     })
+
+@staff_member_required
+def valider_temoignage(request, pk):
+    temoignage = get_object_or_404(Temoignage, pk=pk)
+    temoignage.est_valide = True
+    temoignage.save()
+    messages.success(request, 'Le témoignage a été validé et publié.')
+    return redirect('dashboard')
+
+@staff_member_required
+def supprimer_temoignage(request, pk):
+    temoignage = get_object_or_404(Temoignage, pk=pk)
+    temoignage.delete()
+    messages.warning(request, 'Le témoignage a été supprimé.')
+    return redirect('dashboard')
