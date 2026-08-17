@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block titre %}Accueil — CamerAlert{% endblock %}
+{% block titre %}Accueil — CamerAlert | Plateforme Nationale des Disparus{% endblock %}
 
 {% block contenu %}
 
@@ -9,16 +9,14 @@
     <div class="container text-center">
         <h1>Aide à retrouver les disparus<br>du Cameroun</h1>
         <p>
-            Signalez, recherchez et retrouvez les personnes 
-            disparues partout au Cameroun.
+            Signalez, diffusez et mobilisez les communautés pour retrouver rapidement nos proches partout au Cameroun.
         </p>
 
-        <form action="{% url 'liste_cas' %}" method="GET" 
-              class="search-wrapper">
+        <form action="{% url 'liste_cas' %}" method="GET" class="search-wrapper">
             <input type="text" name="q"
                    class="form-control"
-                   placeholder="Nom, prénom, région...">
-            <button class="btn btn-danger px-4">
+                   placeholder="Rechercher par nom, prénom, ville, région...">
+            <button class="btn btn-danger px-4" type="submit">
                 Rechercher
             </button>
         </form>
@@ -26,15 +24,15 @@
         <div class="stats-hero">
             <div class="stat-item">
                 <div class="stat-number">{{ total_actifs }}</div>
-                <div class="stat-label">Cas actifs</div>
+                <div class="stat-label">Cas en recherche</div>
             </div>
             <div class="stat-item">
                 <div class="stat-number">{{ total_retrouves }}</div>
-                <div class="stat-label">Retrouvées</div>
+                <div class="stat-label">Personnes Retrouvées</div>
             </div>
             <div class="stat-item">
                 <div class="stat-number">10</div>
-                <div class="stat-label">Régions</div>
+                <div class="stat-label">Régions Couvertes</div>
             </div>
         </div>
     </div>
@@ -42,60 +40,120 @@
 
 <!-- Cas récents -->
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-end mb-4">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
         <div>
-            <div class="section-title">Cas récents</div>
+            <div class="section-title">Signalements récents</div>
             <div class="section-subtitle">
-                Les derniers signalements publiés sur la plateforme
+                Les derniers avis de recherche publiés et validés sur la plateforme
             </div>
         </div>
-        <a href="{% url 'liste_cas' %}" 
-           class="btn btn-outline-danger btn-sm">
-            Voir tous →
+        <a href="{% url 'liste_cas' %}" class="btn btn-outline-danger btn-sm">
+            Voir tous les cas ({{ total_actifs }}) →
         </a>
     </div>
 
-    <div class="row g-3">
+    <div class="row g-4">
         {% for cas in cas_recents %}
-        <div class="col-6 col-md-4 col-lg-2 animate-in">
-            <a href="{% url 'detail_cas' cas.pk %}" 
-               class="text-decoration-none">
+        <div class="col-12 col-sm-6 col-lg-4 animate-in">
+            <a href="{% url 'detail_cas' cas.pk %}" class="text-decoration-none">
                 <div class="card card-disparu h-100">
-                    {% if cas.photo %}
-                        <div style="overflow:hidden; height:160px;">
-                            <img src="{{ cas.photo.url }}"
-                                 class="card-img-top w-100 h-100"
-                                 style="object-fit:cover;">
+                    <div class="card-photo-wrapper">
+                        {% if cas.photo %}
+                            <img src="{{ cas.photo.url }}" alt="{{ cas.prenom }} {{ cas.nom }}" loading="lazy">
+                        {% else %}
+                            <div class="avatar-initiales">
+                                <span>{{ cas.prenom|first }}{{ cas.nom|first }}</span>
+                                <span class="avatar-initiales-caption">Photo non disponible</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-photo-overlay-tag">
+                            {% if cas.categorie == 'enfant' %}
+                                <span class="badge-cat badge-cat-enfant">👶 Enfant</span>
+                            {% elif cas.categorie == 'femme' %}
+                                <span class="badge-cat badge-cat-femme">👩 Femme</span>
+                            {% elif cas.categorie == 'homme' %}
+                                <span class="badge-cat badge-cat-homme">👨 Homme</span>
+                            {% elif cas.categorie == 'personne_agee' %}
+                                <span class="badge-cat badge-cat-senior">👵 Personne âgée</span>
+                            {% else %}
+                                <span class="badge-urgent">Alerte</span>
+                            {% endif %}
                         </div>
-                    {% else %}
-                        <div class="avatar-initiales">
-                            {{ cas.prenom|first }}{{ cas.nom|first }}
+
+                        <div class="card-photo-date-tag">
+                            <span>📅 Disparu(e) le {{ cas.date_disparition|date:"d/m/Y" }}</span>
                         </div>
-                    {% endif %}
+                    </div>
+
                     <div class="card-body">
                         <div class="card-name">
                             {{ cas.prenom }} {{ cas.nom }}
                         </div>
-                        <div class="card-meta">
-                            {{ cas.age }} ans · {{ cas.region }}
+                        <div class="card-location">
+                            📍 <strong>{{ cas.region }}</strong> · {{ cas.ville }}
                         </div>
-                        <div class="card-meta">
-                            {{ cas.date_disparition }}
+                        <div class="card-meta-row">
+                            <span>{{ cas.age }} ans</span> · 
+                            <span>{{ cas.get_sexe_display }}</span>
                         </div>
-                        <span class="badge-urgent mt-2 d-inline-block">
-                            Urgent
-                        </span>
+                        <div class="mt-auto pt-2 d-flex justify-content-between align-items-center border-top">
+                            <span class="text-muted small">Réf: {{ cas.reference|default:"CA-2026" }}</span>
+                            <span class="text-danger fw-semibold small">Voir la fiche →</span>
+                        </div>
                     </div>
                 </div>
             </a>
         </div>
         {% empty %}
-        <div class="col-12">
-            <p class="text-muted text-center py-4">
-                Aucun cas publié pour le moment.
-            </p>
+        <div class="col-12 text-center py-5">
+            <div class="p-5 bg-card rounded-4 border">
+                <div class="fs-1 mb-2">🔍</div>
+                <h5 class="fw-bold">Aucun cas actif pour le moment</h5>
+                <p class="text-muted small">Tous les signalements enregistrés sont actuellement résolus ou en attente.</p>
+            </div>
         </div>
         {% endfor %}
+    </div>
+</div>
+
+<!-- Section Guide Citoyen -->
+<div class="container py-4 border-top">
+    <div class="text-center max-w-700 mx-auto mb-4">
+        <h3 class="section-title">Que faire en cas de disparition d'un proche ?</h3>
+        <p class="section-subtitle">Les premières heures sont décisives. Voici les réflexes à adopter immédiatement.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="guide-card">
+                <div class="guide-icon">1</div>
+                <h5 class="fw-bold mb-2">Alerter les forces de l'ordre</h5>
+                <p class="text-muted small mb-0">
+                    Rendez-vous immédiatement au commissariat ou à la brigade de gendarmerie la plus proche, ou composez le <strong>117</strong> ou <strong>1500</strong>.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="guide-card">
+                <div class="guide-icon">2</div>
+                <h5 class="fw-bold mb-2">Publier sur CamerAlert</h5>
+                <p class="text-muted small mb-0">
+                    Créez un signalement avec une photo récente et une description précise des vêtements pour mobiliser le public et les réseaux.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="guide-card">
+                <div class="guide-icon">3</div>
+                <h5 class="fw-bold mb-2">Partager massivement</h5>
+                <p class="text-muted small mb-0">
+                    Utilisez les boutons de partage WhatsApp et réseaux sociaux pour faire circuler l'avis de recherche dans les groupes locaux.
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 
