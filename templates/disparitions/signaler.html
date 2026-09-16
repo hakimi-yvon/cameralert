@@ -1,177 +1,339 @@
 {% extends 'base.html' %}
 
-{% block titre %}Déposer un avis de disparition — CamerAlert{% endblock %}
+{% block titre %}Déposer un avis de recherche — CamerAlert{% endblock %}
 
 {% block contenu %}
 <div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-10 col-lg-8">
-            <div class="form-card animate-in">
 
-                <div class="text-center mb-4">
-                    <div class="auth-icon" style="background:var(--rouge-clair); color:var(--rouge);">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
-                          <path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0v-11zm-1 .724c-2.067.95-4.539 1.481-7 1.656v6.237a25.222 25.222 0 0 1 1.088.085c2.053.204 4.038.668 5.912 1.56V3.224zm-8 7.841V4.934c-.68.027-1.399.043-2.008.053A2.02 2.02 0 0 0 0 7v2c0 1.106.896 1.996 1.994 2.009a68.14 68.14 0 0 1 .496.008 64 64 0 0 1 1.51.048zm1.39 1.081c.285.021.569.047.85.078l.253 1.69a1.5 1.5 0 0 1-.986 1.687l-1.39.463c-.15.05-.316-.016-.395-.15l-.89-1.503a.5.5 0 0 1 .15-.658l1.458-1.077c.307-.227.65-.36 1.002-.387h.001z"/>
-                        </svg>
+    <!-- Fil d'Ariane -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'accueil' %}" class="text-danger text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Signaler une disparition</li>
+        </ol>
+    </nav>
+
+    <!-- Alerte Bannière Urgence Immédiate -->
+    <div class="alert alert-warning border-0 shadow-sm rounded-4 p-3 mb-4 d-flex align-items-center gap-3">
+        <div class="fs-2">⚠️</div>
+        <div class="small">
+            <strong class="d-block text-dark-emphasis mb-0.5">En cas d'urgence vitale ou de disparition d'un enfant :</strong>
+            <span>Prévenez immédiatement et sans délai les forces de l'ordre au Cameroun : <strong>Police Secours (117)</strong> ou la <strong>Gendarmerie Nationale (1500)</strong>, puis diffusez cet avis sur CamerAlert.</span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <!-- Formulaire Principal -->
+        <div class="col-lg-8">
+            <div class="form-card animate-in border-0 shadow-sm" style="border-radius: 20px; border: 1px solid var(--border-color) !important;">
+                
+                <div class="border-bottom pb-3 mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-danger px-2.5 py-1 fw-bold" style="font-size:11px;">PROCÉDURE NATIONALE</span>
+                        <span class="text-muted small">Diffusion multi-canaux</span>
                     </div>
-                    <h3 class="fw-bold mb-1">Signaler une disparition</h3>
+                    <h2 class="fw-bold mb-1">Déposer un avis de disparition</h2>
                     <p class="text-muted small mb-0">
-                        Chaque détail précis augmente les chances de retrouver rapidement la personne.
+                        Votre signalement sera relu et validé en priorité par nos équipes de modération avant diffusion publique.
                     </p>
                 </div>
 
-                <form method="POST" enctype="multipart/form-data" class="text-start" id="form-signalement">
+                <form method="POST" enctype="multipart/form-data" id="form-signalement" novalidate>
                     {% csrf_token %}
 
-                    <!-- ÉTAPE 1 : IDENTITÉ -->
-                    <div class="form-step-header">
-                        <span class="form-step-num">1</span>
-                        <span>Identité de la personne disparue</span>
+                    <!-- SECTION 1 : IDENTITÉ & PROFIL -->
+                    <div class="form-step-header d-flex align-items-center gap-2 p-2 px-3 rounded-3 mb-3" style="background: rgba(224, 49, 49, 0.08); border-left: 4px solid var(--rouge-500);">
+                        <span class="form-step-num bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:24px;height:24px;font-size:12px;">1</span>
+                        <span class="fw-bold text-dark-emphasis">Identité de la personne disparue</span>
                     </div>
 
-                    <div class="row g-3">
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Nom de famille <span class="text-danger">*</span></label>
+                            <label class="form-label small fw-bold">Nom de famille <span class="text-danger">*</span></label>
                             {{ form.nom }}
                             {% if form.nom.errors %}<div class="text-danger small mt-1">{{ form.nom.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Prénom(s) <span class="text-danger">*</span></label>
+                            <label class="form-label small fw-bold">Prénom(s) <span class="text-danger">*</span></label>
                             {{ form.prenom }}
                             {% if form.prenom.errors %}<div class="text-danger small mt-1">{{ form.prenom.errors }}</div>{% endif %}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Âge <span class="text-danger">*</span></label>
+                        <div class="col-sm-4">
+                            <label class="form-label small fw-bold">Âge (années) <span class="text-danger">*</span></label>
                             {{ form.age }}
                             {% if form.age.errors %}<div class="text-danger small mt-1">{{ form.age.errors }}</div>{% endif %}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Sexe <span class="text-danger">*</span></label>
+                        <div class="col-sm-4">
+                            <label class="form-label small fw-bold">Sexe <span class="text-danger">*</span></label>
                             {{ form.sexe }}
                             {% if form.sexe.errors %}<div class="text-danger small mt-1">{{ form.sexe.errors }}</div>{% endif %}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Catégorie <span class="text-danger">*</span></label>
+                        <div class="col-sm-4">
+                            <label class="form-label small fw-bold">Catégorie <span class="text-danger">*</span></label>
                             {{ form.categorie }}
                             {% if form.categorie.errors %}<div class="text-danger small mt-1">{{ form.categorie.errors }}</div>{% endif %}
                         </div>
                     </div>
 
-                    <!-- ÉTAPE 2 : APPARENCE PHYSIQUE -->
-                    <div class="form-step-header">
-                        <span class="form-step-num">2</span>
-                        <span>Description physique & Signes distinctifs</span>
+                    <!-- SECTION 2 : DESCRIPTION PHYSIQUE & TENUE -->
+                    <div class="form-step-header d-flex align-items-center gap-2 p-2 px-3 rounded-3 mb-3" style="background: rgba(224, 49, 49, 0.08); border-left: 4px solid var(--rouge-500);">
+                        <span class="form-step-num bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:24px;height:24px;font-size:12px;">2</span>
+                        <span class="fw-bold text-dark-emphasis">Description physique & Signes distinctifs</span>
                     </div>
 
-                    <div class="row g-3">
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Taille (ex: 1m70, Moyenne...)</label>
+                            <label class="form-label small fw-bold">Taille approximative</label>
                             {{ form.taille }}
                             {% if form.taille.errors %}<div class="text-danger small mt-1">{{ form.taille.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Teint (ex: Clair, Ébène, Marron...)</label>
+                            <label class="form-label small fw-bold">Teint / Carnation</label>
                             {{ form.teint }}
                             {% if form.teint.errors %}<div class="text-danger small mt-1">{{ form.teint.errors }}</div>{% endif %}
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-semibold">Signes particuliers (cicatrice, lunettes, tatouage...)</label>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Signes particuliers (tatouage, cicatrice, lunettes, boitement...)</label>
                             {{ form.signes_particuliers }}
                             {% if form.signes_particuliers.errors %}<div class="text-danger small mt-1">{{ form.signes_particuliers.errors }}</div>{% endif %}
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-semibold">Vêtements portés au moment de la disparition</label>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Vêtements portés au moment de la disparition</label>
                             {{ form.vetements }}
                             {% if form.vetements.errors %}<div class="text-danger small mt-1">{{ form.vetements.errors }}</div>{% endif %}
                         </div>
                     </div>
 
-                    <!-- ÉTAPE 3 : CIRCONSTANCES & PHOTO -->
-                    <div class="form-step-header">
-                        <span class="form-step-num">3</span>
-                        <span>Circonstances du lieu & Photo</span>
+                    <!-- SECTION 3 : LIEU, DATE, CONTACT & PHOTO -->
+                    <div class="form-step-header d-flex align-items-center gap-2 p-2 px-3 rounded-3 mb-3" style="background: rgba(224, 49, 49, 0.08); border-left: 4px solid var(--rouge-500);">
+                        <span class="form-step-num bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:24px;height:24px;font-size:12px;">3</span>
+                        <span class="fw-bold text-dark-emphasis">Circonstances, Localisation & Photo</span>
                     </div>
 
-                    <div class="row g-3">
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Date de disparition <span class="text-danger">*</span></label>
+                            <label class="form-label small fw-bold">Date de disparition <span class="text-danger">*</span></label>
                             {{ form.date_disparition }}
                             {% if form.date_disparition.errors %}<div class="text-danger small mt-1">{{ form.date_disparition.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Heure approximative</label>
+                            <label class="form-label small fw-bold">Heure approximative</label>
                             {{ form.heure_disparition }}
                             {% if form.heure_disparition.errors %}<div class="text-danger small mt-1">{{ form.heure_disparition.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Région <span class="text-danger">*</span></label>
+                            <label class="form-label small fw-bold">Région du Cameroun <span class="text-danger">*</span></label>
                             {{ form.region }}
                             {% if form.region.errors %}<div class="text-danger small mt-1">{{ form.region.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Ville / Quartier <span class="text-danger">*</span></label>
+                            <label class="form-label small fw-bold">Ville / Quartier / Carrefour précis <span class="text-danger">*</span></label>
                             {{ form.ville }}
                             {% if form.ville.errors %}<div class="text-danger small mt-1">{{ form.ville.errors }}</div>{% endif %}
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-semibold">Téléphone d'urgence (famille / proche)</label>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">
+                                📞 Numéro d'urgence direct de la famille / référent
+                            </label>
                             {{ form.telephone_contact }}
-                            <div class="form-text text-muted small">Ce numéro sera affiché publiquement sur la fiche pour que les personnes qui reconnaissent le proche puissent vous contacter directement.</div>
+                            <div class="form-text text-muted small mt-1">
+                                Ce numéro apparaîtra publiquement avec un lien direct WhatsApp pour recevoir les appels de témoins.
+                            </div>
                             {% if form.telephone_contact.errors %}<div class="text-danger small mt-1">{{ form.telephone_contact.errors }}</div>{% endif %}
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-semibold">Circonstances détaillées de la disparition <span class="text-danger">*</span></label>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Circonstances détaillées de la disparition <span class="text-danger">*</span></label>
                             {{ form.description }}
                             {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors }}</div>{% endif %}
                         </div>
 
-                        <!-- Zone d'upload avec prévisualisation dynamique -->
-                        <div class="col-md-12">
-                            <label class="form-label fw-semibold">Photo de la personne disparue</label>
-                            <div class="image-preview-box text-center p-4">
-                                <div id="upload-placeholder">
-                                    <div class="fs-2 text-danger mb-1">📷</div>
-                                    <div class="fw-semibold small">Sélectionnez une photo récente et nette</div>
-                                    <div class="text-muted small">Formats acceptés : JPG, PNG (Max 5 Mo)</div>
+                        <!-- ZONE D'UPLOAD MODERNE & DRAG & DROP -->
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Photo nette et récente</label>
+                            
+                            <div class="border rounded-4 p-4 text-center position-relative upload-dropzone" 
+                                 id="dropzone-box"
+                                 style="border: 2px dashed var(--border-color) !important; background: var(--bg-hover); cursor: pointer; transition: all 0.2s ease;">
+                                
+                                <div id="upload-idle">
+                                    <div class="mb-2">
+                                        <span class="p-3 bg-danger-subtle text-danger rounded-circle d-inline-block fs-3">📷</span>
+                                    </div>
+                                    <h6 class="fw-bold mb-1">Glissez une photo ici ou cliquez pour parcourir</h6>
+                                    <p class="text-muted small mb-0">Formats supportés : JPG, PNG, WEBP — Max 5 Mo</p>
                                 </div>
-                                {{ form.photo }}
-                                <img id="image-preview" src="#" alt="Aperçu" class="preview-img-target shadow-sm">
+
+                                <div id="upload-selected" class="d-none">
+                                    <div class="d-flex flex-column align-items-center gap-2">
+                                        <img id="img-preview" src="#" alt="Aperçu" class="rounded-3 shadow-sm" style="max-height: 200px; max-width: 100%; object-fit: contain;">
+                                        <div class="d-flex align-items-center gap-2 mt-2">
+                                            <span class="badge bg-success-subtle text-success small" id="file-info-badge">Photo chargée</span>
+                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" id="btn-reset-photo" style="font-size:12px;">Remplacer</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <input type="file" name="photo" id="id_photo" accept="image/*" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" style="cursor:pointer;">
                             </div>
+
                             {% if form.photo.errors %}<div class="text-danger small mt-1">{{ form.photo.errors }}</div>{% endif %}
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-danger w-100 py-3 mt-4 fw-bold" style="font-size:16px;">
-                        🚀 Valider et Soumettre le Signalement
-                    </button>
-                    <p class="text-muted text-center small mt-2">
-                        Votre signalement sera examiné et publié après vérification par les modérateurs de CamerAlert.
-                    </p>
+                    <!-- BOUTON DE SOUMISSION -->
+                    <div class="pt-2">
+                        <button type="submit" class="btn btn-danger w-100 py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" style="font-size:16px; border-radius:12px;" id="btn-submit-form">
+                            <span>🚀 Publier l'avis de disparition</span>
+                        </button>
+                        <p class="text-muted text-center small mt-3 mb-0">
+                            🔒 En soumettant ce formulaire, vous certifiez sur l'honneur l'exactitude des informations fournies.
+                        </p>
+                    </div>
+
                 </form>
 
             </div>
         </div>
+
+        <!-- Colonne Latérale : Guide & Sécurité -->
+        <div class="col-lg-4">
+            
+            <!-- Conseils pour une recherche efficace -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="p-3 border-bottom d-flex align-items-center gap-2">
+                    <span class="fs-5">💡</span>
+                    <h6 class="fw-bold mb-0">Conseils d'urgence</h6>
+                </div>
+                <div class="p-3">
+                    <div class="d-flex gap-3 mb-3">
+                        <span class="badge bg-danger rounded-circle p-2 d-flex align-items-center justify-content-center" style="width:24px;height:24px;font-size:11px;">1</span>
+                        <div class="small">
+                            <strong class="d-block text-dark-emphasis">Agir immédiatement</strong>
+                            Il n'y a aucun délai légal d'attente de 24h ou 48h. Les premières heures sont déterminantes.
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3 mb-3">
+                        <span class="badge bg-danger rounded-circle p-2 d-flex align-items-center justify-content-center" style="width:24px;height:24px;font-size:11px;">2</span>
+                        <div class="small">
+                            <strong class="d-block text-dark-emphasis">Choisir une photo récente</strong>
+                            Évitez les filtres, lunettes de soleil ou photos de groupe floues. Privilégiez un portrait net de face.
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3 mb-3">
+                        <span class="badge bg-danger rounded-circle p-2 d-flex align-items-center justify-content-center" style="width:24px;height:24px;font-size:11px;">3</span>
+                        <div class="small">
+                            <strong class="d-block text-dark-emphasis">Détails vestimentaires</strong>
+                            Précisez les couleurs, le type de chaussures ou d'accessoires (sac, chapeau).
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <span class="badge bg-danger rounded-circle p-2 d-flex align-items-center justify-content-center" style="width:24px;height:24px;font-size:11px;">4</span>
+                        <div class="small">
+                            <strong class="d-block text-dark-emphasis">Téléphone WhatsApp</strong>
+                            Assurez-vous que le contact fourni soit connecté et capable de recevoir des photos ou localisations de témoins.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Numéros d'urgence nationaux -->
+            <div class="card border-0 shadow-sm p-4 text-white" style="border-radius: 20px; background: linear-gradient(135deg, #111827 0%, #1f2937 100%);">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="fs-4">🇨🇲</span>
+                    <h6 class="fw-bold mb-0 text-white">Contacts d'urgence Cameroun</h6>
+                </div>
+                <div class="d-flex flex-column gap-3 small">
+                    <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-secondary">
+                        <span>Police Secours</span>
+                        <a href="tel:117" class="badge bg-danger fs-6 text-decoration-none px-3 py-1">117</a>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-secondary">
+                        <span>Gendarmerie Nationale</span>
+                        <a href="tel:1500" class="badge bg-danger fs-6 text-decoration-none px-3 py-1">1500</a>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Sapeurs-Pompiers</span>
+                        <a href="tel:118" class="badge bg-secondary fs-6 text-decoration-none px-3 py-1">118</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
+
 </div>
 
 <script>
-    // Prévisualisation en direct de la photo sélectionnée
-    const inputPhoto = document.querySelector('input[type="file"]');
-    const imagePreview = document.getElementById('image-preview');
-    const placeholder = document.getElementById('upload-placeholder');
+    const fileInput = document.getElementById('id_photo');
+    const dropzone = document.getElementById('dropzone-box');
+    const uploadIdle = document.getElementById('upload-idle');
+    const uploadSelected = document.getElementById('upload-selected');
+    const imgPreview = document.getElementById('img-preview');
+    const fileInfoBadge = document.getElementById('file-info-badge');
+    const btnResetPhoto = document.getElementById('btn-reset-photo');
 
-    if (inputPhoto) {
-        inputPhoto.addEventListener('change', function() {
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
+                // Vérifier la taille max (5 Mo)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("Ce fichier est trop lourd (maximum 5 Mo). Veuillez en sélectionner un autre.");
+                    this.value = '';
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    imagePreview.style.display = 'inline-block';
-                    if (placeholder) placeholder.style.display = 'none';
-                }
+                    imgPreview.src = e.target.result;
+                    uploadIdle.classList.add('d-none');
+                    uploadSelected.classList.remove('d-none');
+                    const sizeMo = (file.size / (1024 * 1024)).toFixed(2);
+                    fileInfoBadge.textContent = `${file.name} (${sizeMo} Mo)`;
+                };
                 reader.readAsDataURL(file);
             }
+        });
+    }
+
+    if (btnResetPhoto) {
+        btnResetPhoto.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (fileInput) fileInput.value = '';
+            uploadSelected.classList.add('d-none');
+            uploadIdle.classList.remove('d-none');
+            imgPreview.src = '#';
+        });
+    }
+
+    // Drag & drop visual feedback
+    if (dropzone) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--rouge-500)';
+                dropzone.style.backgroundColor = 'rgba(224, 49, 49, 0.05)';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--border-color)';
+                dropzone.style.backgroundColor = 'var(--bg-hover)';
+            }, false);
+        });
+    }
+
+    // Protection anti-double-soumission
+    const formSignalement = document.getElementById('form-signalement');
+    const btnSubmit = document.getElementById('btn-submit-form');
+    if (formSignalement && btnSubmit) {
+        formSignalement.addEventListener('submit', function() {
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Envoi du signalement...`;
         });
     }
 </script>

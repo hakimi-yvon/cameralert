@@ -15,17 +15,24 @@ class PersonneDisparueForm(forms.ModelForm):
             'description', 'photo',
         ]
         widgets = {
-            'date_disparition': forms.DateInput(
-                attrs={'type': 'date'}
-            ),
-            'heure_disparition': forms.TimeInput(
-                attrs={'type': 'time'}
-            ),
+            'nom': forms.TextInput(attrs={'placeholder': 'Ex: Kamga, Mbarga, Aboubakar...'}),
+            'prenom': forms.TextInput(attrs={'placeholder': 'Ex: Christian, Aminatou...'}),
+            'age': forms.NumberInput(attrs={'placeholder': 'Ex: 15', 'min': 0, 'max': 120}),
+            'taille': forms.TextInput(attrs={'placeholder': 'Ex: 1m65, 1m75...'}),
+            'teint': forms.TextInput(attrs={'placeholder': 'Ex: Ébène, Clair, Noir, Métis...'}),
+            'signes_particuliers': forms.TextInput(attrs={'placeholder': 'Ex: Cicatrice au front, lunettes de vue, grain de beauté...'}),
+            'vetements': forms.TextInput(attrs={'placeholder': 'Ex: Polo rouge, pantalon noir, baskets blanches...'}),
+            'date_disparition': forms.DateInput(attrs={'type': 'date'}),
+            'heure_disparition': forms.TimeInput(attrs={'type': 'time'}),
+            'ville': forms.TextInput(attrs={'placeholder': 'Ex: Douala (Akwa), Yaoundé (Bastos), Bafoussam...'}),
             'telephone_contact': forms.TextInput(
-                attrs={'placeholder': 'Ex: +237 6XX XX XX XX (Orange, MTN, WhatsApp...)'}
+                attrs={'placeholder': 'Ex: +237 690 00 00 00 (Orange, MTN, WhatsApp)'}
             ),
             'description': forms.Textarea(
-                attrs={'rows': 4}
+                attrs={
+                    'rows': 4,
+                    'placeholder': 'Expliquez précisément le déroulement : dernier endroit où la personne a été aperçue, direction prise, état de santé (Alzheimer, épilepsie...), toute information utile pour les recherches.'
+                }
             ),
         }
 

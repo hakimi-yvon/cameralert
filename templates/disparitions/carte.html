@@ -1,127 +1,335 @@
 {% extends 'base.html' %}
 
-{% block titre %}Carte des disparitions — CamerAlert{% endblock %}
+{% block titre %}Carte Géospatiale des Disparitions — CamerAlert{% endblock %}
 
 {% block contenu %}
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-end mb-3">
+
+    <!-- Fil d'ariane & En-tête -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h2 class="fw-semibold mb-0">Carte des disparitions</h2>
-            <p class="text-muted small mb-0">Visualisation géographique des cas actifs au Cameroun</p>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb small mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'accueil' %}" class="text-danger text-decoration-none">Accueil</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Surveillance Géographique</li>
+                </ol>
+            </nav>
+            <div class="d-flex align-items-center gap-2">
+                <h1 class="h2 fw-bold mb-0">Carte Nationale des Alertes</h1>
+                <span class="badge bg-danger d-inline-flex align-items-center gap-1 py-1 px-2">
+                    <span class="pulse-dot"></span> LIVE RADAR
+                </span>
+            </div>
+            <p class="text-muted small mb-0 mt-1">
+                Cartographie en temps réel des avis de disparition actifs à travers les 10 régions du Cameroun.
+            </p>
         </div>
-        <div class="d-flex gap-3">
-            <div class="text-center">
-                <div class="fw-bold fs-4 text-danger">{{ total_actifs }}</div>
-                <div class="text-muted small">Cas actifs</div>
-            </div>
-            <div class="text-center">
-                <div class="fw-bold fs-4 text-success">{{ total_retrouves }}</div>
-                <div class="text-muted small">Retrouvées</div>
-            </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'liste_cas' %}" class="btn btn-outline-secondary btn-sm px-3 fw-semibold">
+                📋 Voir la liste complète
+            </a>
+            <a href="{% url 'signaler' %}" class="btn btn-danger btn-sm px-3 fw-semibold">
+                + Signaler une disparition
+            </a>
         </div>
     </div>
 
-    <!-- Carte -->
-    <div class="card shadow-sm mb-4" style="border-radius:12px; overflow:hidden;">
-        <div id="carte-cameroun" style="height: 520px; width: 100%;"></div>
+    <!-- Layout Grille : Carte & Panneau Latéral -->
+    <div class="row g-4 mb-4">
+        
+        <!-- Panneau Principal Carte -->
+        <div class="col-lg-8 col-xl-9">
+            <div class="card border-0 shadow-sm overflow-hidden position-relative" style="border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color) !important;">
+                
+                <!-- HUD Flottant au-dessus de la carte -->
+                <div class="position-absolute top-0 start-0 m-3 z-3 d-none d-md-flex align-items-center gap-2 p-2 rounded-4 shadow-sm"
+                     style="background: rgba(var(--bg-card-rgb, 255, 255, 255), 0.88); backdrop-filter: blur(12px); border: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center gap-2 px-2 py-1">
+                        <span class="badge bg-danger rounded-circle p-1" style="width:10px;height:10px;"></span>
+                        <span class="small fw-bold text-dark-emphasis">{{ total_actifs }} cas actif{{ total_actifs|pluralize }}</span>
+                    </div>
+                    <div class="vr my-1"></div>
+                    <div class="d-flex align-items-center gap-2 px-2 py-1">
+                        <span class="badge bg-success rounded-circle p-1" style="width:10px;height:10px;"></span>
+                        <span class="small fw-semibold text-muted">{{ total_retrouves }} retrouvée{{ total_retrouves|pluralize }}</span>
+                    </div>
+                </div>
+
+                <!-- Sélecteur de Style de Carte (Light / Dark) -->
+                <div class="position-absolute top-0 end-0 m-3 z-3">
+                    <div class="btn-group btn-group-sm shadow-sm rounded-3 overflow-hidden" style="border: 1px solid var(--border-color);">
+                        <button type="button" class="btn btn-sm btn-light active" id="btn-tiles-auto" title="Mode automatique calqué sur le thème du site">Auto</button>
+                        <button type="button" class="btn btn-sm btn-light" id="btn-tiles-light" title="Fond clair">Clair</button>
+                        <button type="button" class="btn btn-sm btn-light" id="btn-tiles-dark" title="Fond satellite / sombre">Sombre</button>
+                    </div>
+                </div>
+
+                <!-- Élément Leaflet -->
+                <div id="carte-cameroun" style="height: 600px; width: 100%; z-index: 1;"></div>
+
+                <!-- Footer carte : Légende interactive -->
+                <div class="card-footer p-3 bg-transparent border-top d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <span class="small fw-bold text-muted text-uppercase" style="letter-spacing:0.5px; font-size:11px;">Intensité :</span>
+                        <div class="d-flex align-items-center gap-1 small">
+                            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#e03131;opacity:0.6;"></span>
+                            <span class="text-muted">1 cas</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1 small">
+                            <span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#e03131;opacity:0.8;"></span>
+                            <span class="text-muted">2–4 cas</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1 small">
+                            <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:#c92a2a;box-shadow:0 0 8px rgba(201,42,42,0.6);"></span>
+                            <span class="fw-semibold text-danger">5+ cas (Zone prioritaire)</span>
+                        </div>
+                    </div>
+                    <div class="small text-muted">
+                        💡 Astuce : Cliquez sur un marqueur pour afficher la liste des disparus dans cette région.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Panneau Latéral : Répartition & Actions Régionales -->
+        <div class="col-lg-4 col-xl-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color) !important;">
+                
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-0">Régions concernées</h6>
+                        <span class="text-muted small">Cliquer pour localiser</span>
+                    </div>
+                    <span class="badge bg-danger-subtle text-danger px-2 py-1 fw-bold">{{ markers|length }} région{{ markers|length|pluralize }}</span>
+                </div>
+
+                <div class="p-2 overflow-auto" style="max-height: 520px;">
+                    {% if markers %}
+                        <div class="list-group list-group-flush gap-1">
+                            {% for m in markers %}
+                            <div class="list-group-item list-group-item-action border-0 rounded-3 p-2.5 region-item"
+                                 role="button"
+                                 onclick="focusRegion({{ m.lat }}, {{ m.lng }}, '{{ m.region|escapejs }}')"
+                                 style="cursor: pointer; transition: all 0.2s ease;">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold text-dark-emphasis small">📍 {{ m.region }}</span>
+                                    <span class="badge bg-danger rounded-pill px-2 py-0.5" style="font-size:11px;">
+                                        {{ m.total }} alerte{{ m.total|pluralize }}
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="text-muted" style="font-size:11px;">Afficher sur la carte</span>
+                                    <a href="{% url 'liste_cas' %}?region={{ m.region|urlencode }}" 
+                                       class="btn btn-outline-danger btn-sm py-0 px-2" 
+                                       style="font-size:11px; height:22px; line-height:20px;"
+                                       onclick="event.stopPropagation();">
+                                        Voir les cas →
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <div class="fs-3 mb-2">🎉</div>
+                            <div class="fw-bold small">Aucun cas actif</div>
+                            <div class="small">Toutes les disparitions signalées ont été résolues ou aucun cas n'est publié.</div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Bloc Sécurité & Coopération -->
+                <div class="mt-auto p-3 border-top bg-light-subtle rounded-bottom-4">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="text-danger">🛡️</span>
+                        <span class="fw-bold small">Services d'Intervention</span>
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Police Secours : <a href="tel:117" class="fw-bold text-danger text-decoration-none">117</a></span>
+                        <span>Gendarmerie : <a href="tel:1500" class="fw-bold text-danger text-decoration-none">1500</a></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 
-    <!-- Légende -->
-    <div class="card shadow-sm p-3">
-        <div class="fw-semibold mb-2">Légende</div>
-        <div class="d-flex flex-wrap gap-3 align-items-center">
-            <div class="d-flex align-items-center gap-2">
-                <div style="width:18px;height:18px;border-radius:50%;background:#dc3545;opacity:0.85;"></div>
-                <span class="small">1–2 cas</span>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <div style="width:24px;height:24px;border-radius:50%;background:#dc3545;opacity:0.85;"></div>
-                <span class="small">3–5 cas</span>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <div style="width:32px;height:32px;border-radius:50%;background:#dc3545;opacity:0.85;"></div>
-                <span class="small">6+ cas</span>
-            </div>
-            <span class="text-muted small ms-2">Cliquez sur un cercle pour voir les détails et filtrer les cas</span>
-        </div>
-    </div>
 </div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<style>
+    /* Styling personnalisé des cercles et popups Leaflet */
+    .leaflet-popup-content-wrapper {
+        border-radius: 16px !important;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25) !important;
+        padding: 6px !important;
+        border: 1px solid rgba(0,0,0,0.06);
+    }
+    [data-theme="dark"] .leaflet-popup-content-wrapper {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    [data-theme="dark"] .leaflet-popup-tip {
+        background: #1e293b !important;
+    }
+    .region-item:hover {
+        background: var(--bg-hover) !important;
+        transform: translateX(3px);
+    }
+</style>
+
 <script>
-    // Initialisation de la carte centrée sur le Cameroun
+    // Initialisation centrée sur le Cameroun
     const map = L.map('carte-cameroun', {
-        center: [5.5, 12.3],
+        center: [5.7, 12.3],
         zoom: 6,
-        zoomControl: true,
+        minZoom: 5,
+        maxZoom: 12,
+        zoomControl: false,
     });
 
-    // Fond de carte CartoDB Positron (élégant, clair, gratuit)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    // Contrôles de zoom positionnés en bas à droite
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Définition des tuiles
+    const lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
         maxZoom: 18,
-    }).addTo(map);
+    });
+
+    const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        maxZoom: 18,
+    });
+
+    // Détection du thème actuel
+    function applyCurrentThemeTiles() {
+        const theme = document.documentElement.getAttribute('data-theme') || 'light';
+        if (theme === 'dark') {
+            if (map.hasLayer(lightTiles)) map.removeLayer(lightTiles);
+            darkTiles.addTo(map);
+        } else {
+            if (map.hasLayer(darkTiles)) map.removeLayer(darkTiles);
+            lightTiles.addTo(map);
+        }
+    }
+
+    applyCurrentThemeTiles();
+
+    // Gestion manuelle des boutons de tuiles
+    document.getElementById('btn-tiles-light')?.addEventListener('click', function() {
+        if (map.hasLayer(darkTiles)) map.removeLayer(darkTiles);
+        lightTiles.addTo(map);
+        setActiveTileBtn(this);
+    });
+    document.getElementById('btn-tiles-dark')?.addEventListener('click', function() {
+        if (map.hasLayer(lightTiles)) map.removeLayer(lightTiles);
+        darkTiles.addTo(map);
+        setActiveTileBtn(this);
+    });
+    document.getElementById('btn-tiles-auto')?.addEventListener('click', function() {
+        applyCurrentThemeTiles();
+        setActiveTileBtn(this);
+    });
+
+    function setActiveTileBtn(activeBtn) {
+        document.querySelectorAll('#btn-tiles-auto, #btn-tiles-light, #btn-tiles-dark').forEach(b => b.classList.remove('active', 'btn-danger'));
+        activeBtn.classList.add('active');
+    }
+
+    // Écouteur de changement de thème global (si l'utilisateur clique sur le switch navbar)
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                if (document.getElementById('btn-tiles-auto')?.classList.contains('active')) {
+                    applyCurrentThemeTiles();
+                }
+            }
+        });
+    });
+    observer.observe(document.documentElement, { attributes: true });
 
     // Données des régions injectées depuis Django
     const markers = {{ markers_json|safe }};
+    const circleLayers = {};
 
-    // Rayon du cercle selon le nombre de cas
+    // Calcul du rayon selon le nombre de cas
     function getRadius(total) {
-        if (total >= 10) return 40000;
-        if (total >= 6)  return 32000;
-        if (total >= 3)  return 24000;
-        return 16000;
+        if (total >= 10) return 46000;
+        if (total >= 5)  return 36000;
+        if (total >= 2)  return 26000;
+        return 18000;
     }
 
-    // Opacité selon l'urgence
+    // Calcul de l'opacité selon le nombre
     function getOpacity(total) {
-        if (total >= 6) return 0.90;
-        if (total >= 3) return 0.75;
-        return 0.60;
+        if (total >= 5) return 0.88;
+        if (total >= 2) return 0.75;
+        return 0.62;
     }
 
     markers.forEach(function(m) {
         const circle = L.circle([m.lat, m.lng], {
-            color: '#dc3545',
-            fillColor: '#dc3545',
+            color: '#e03131',
+            fillColor: '#fa5252',
             fillOpacity: getOpacity(m.total),
             weight: 2,
             radius: getRadius(m.total),
         }).addTo(map);
 
-        // Popup au clic
         const url = `/cas/?region=${encodeURIComponent(m.region)}`;
-        circle.bindPopup(`
-            <div style="text-align:center; min-width:140px;">
-                <strong style="font-size:15px;">${m.region}</strong><br>
-                <span style="font-size:22px; font-weight:700; color:#dc3545;">${m.total}</span><br>
-                <span style="color:#666; font-size:12px;">cas actif${m.total > 1 ? 's' : ''}</span><br>
-                <a href="${url}"
-                   style="display:inline-block; margin-top:8px; padding:4px 12px;
-                          background:#dc3545; color:#fff; border-radius:6px;
-                          text-decoration:none; font-size:12px;">
-                    Voir les cas →
+        
+        const popupContent = `
+            <div style="text-align:center; padding:10px 14px; min-width:180px;">
+                <span class="badge bg-danger-subtle text-danger mb-2 px-2 py-1 fw-bold" style="font-size:11px;">RÉGION DU CAMEROUN</span>
+                <h5 style="font-weight:700; margin:0 0 6px 0; font-size:16px;">${m.region}</h5>
+                <div style="font-size:26px; font-weight:800; color:#e03131; line-height:1;">${m.total}</div>
+                <div style="font-size:12px; color:#6c757d; margin-top:2px; margin-bottom:12px;">cas actif${m.total > 1 ? 's' : ''} sous surveillance</div>
+                <a href="${url}" class="btn btn-danger btn-sm w-100 fw-bold py-1.5" style="border-radius:8px; font-size:12px; text-decoration:none;">
+                    Consulter les avis (${m.total}) →
                 </a>
             </div>
-        `);
+        `;
 
-        // Tooltip au survol
-        circle.bindTooltip(`<b>${m.region}</b> — ${m.total} cas`, {
-            permanent: false,
+        circle.bindPopup(popupContent);
+
+        circle.bindTooltip(`<strong>${m.region}</strong> : ${m.total} alerte${m.total > 1 ? 's' : ''}`, {
             direction: 'top',
+            offset: [0, -10],
         });
+
+        circleLayers[m.region] = circle;
     });
 
-    // Si aucune région avec des cas, afficher un message
+    // Fonction d'interaction depuis la liste latérale
+    window.focusRegion = function(lat, lng, regionName) {
+        map.flyTo([lat, lng], 8, {
+            duration: 1.2,
+            easeLinearity: 0.25
+        });
+
+        const circle = circleLayers[regionName];
+        if (circle) {
+            setTimeout(function() {
+                circle.openPopup();
+            }, 1200);
+        }
+    };
+
+    // Si aucun cas
     if (markers.length === 0) {
         L.popup()
-            .setLatLng([5.5, 12.3])
-            .setContent('<div style="text-align:center">Aucun cas actif pour le moment</div>')
+            .setLatLng([5.7, 12.3])
+            .setContent('<div style="text-align:center; padding:10px;"><strong>Plateforme CamerAlert</strong><br><span style="color:#28a745;">✓ Aucun avis de recherche actif actuellement</span></div>')
             .openOn(map);
     }
 </script>

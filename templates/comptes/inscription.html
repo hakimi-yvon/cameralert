@@ -1,46 +1,85 @@
 {% extends 'base.html' %}
-{% block titre %}Inscription — CamerAlert{% endblock %}
+
+{% block titre %}Créer un compte — CamerAlert{% endblock %}
 
 {% block contenu %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="form-card text-center animate-in">
-                <div class="auth-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
-                      <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
-                      <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5Z"/>
-                    </svg>
+        <div class="col-md-8 col-lg-6 col-xl-5">
+            
+            <div class="form-card animate-in border-0 shadow-sm" style="border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color) !important; padding: 36px 32px;">
+                
+                <!-- Logo & Titre -->
+                <div class="text-center mb-4">
+                    <div class="p-3 bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5Z"/>
+                        </svg>
+                    </div>
+                    <div class="badge bg-danger-subtle text-danger px-2.5 py-1 fw-bold mb-2" style="font-size:11px;">REJOINDRE LA COMMUNAUTÉ</div>
+                    <h2 class="h3 fw-bold mb-1">Créer un compte</h2>
+                    <p class="text-muted small mb-0">
+                        Inscrivez-vous pour publier des avis de recherche et suivre l'avancement des dossiers.
+                    </p>
                 </div>
-                <h4 class="fw-semibold mb-1">Créer un compte</h4>
-                <p class="text-muted small mb-4">
-                    Rejoignez CamerAlert gratuitement.
-                </p>
-                <form method="POST" class="text-start">
+
+                <!-- Formulaire Inscription -->
+                <form method="POST" id="form-signup" novalidate>
                     {% csrf_token %}
+
                     {% for field in form %}
                         <div class="mb-3">
-                            <label class="form-label">{{ field.label }}</label>
+                            <label class="form-label small fw-bold text-dark-emphasis mb-1">{{ field.label }}</label>
                             {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text text-muted small" style="font-size:11px;">{{ field.help_text|safe }}</div>
+                            {% endif %}
                             {% if field.errors %}
-                                <div class="text-danger small mt-1">
-                                    {{ field.errors }}
-                                </div>
+                                <div class="text-danger small mt-1">{{ field.errors }}</div>
                             {% endif %}
                         </div>
                     {% endfor %}
-                    <button class="btn btn-danger w-100 mt-2 py-2">
-                        Créer mon compte
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="check-consent" required checked>
+                        <label class="form-check-label small text-muted" for="check-consent">
+                            J'accepte d'utiliser CamerAlert dans le strict respect de la loi et de la dignité des familles.
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100 py-2.5 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" style="border-radius:12px;" id="btn-submit-signup">
+                        <span>Créer mon compte citoyen</span>
                     </button>
                 </form>
-                <div class="mt-4 small text-muted">
-                    Déjà un compte ?
-                    <a href="{% url 'connexion' %}" class="text-danger fw-medium text-decoration-none">
+
+                <div class="mt-4 pt-3 border-top text-center small text-muted">
+                    Vous possédez déjà un compte ?
+                    <a href="{% url 'connexion' %}" class="text-danger fw-bold text-decoration-none ms-1">
                         Se connecter
                     </a>
                 </div>
+
+                <div class="mt-4 text-center">
+                    <span class="text-muted" style="font-size:11px;">
+                        🇨🇲 Initiative citoyenne solidaire pour le Cameroun
+                    </span>
+                </div>
+
             </div>
+
         </div>
     </div>
 </div>
+
+<script>
+    const formSignup = document.getElementById('form-signup');
+    const btnSubmit = document.getElementById('btn-submit-signup');
+    if (formSignup && btnSubmit) {
+        formSignup.addEventListener('submit', function() {
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Création du compte...`;
+        });
+    }
+</script>
 {% endblock %}

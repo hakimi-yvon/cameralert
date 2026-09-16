@@ -1,44 +1,174 @@
 {% extends 'base.html' %}
-{% block titre %}Témoignage — CamerAlert{% endblock %}
+
+{% block titre %}Apporter un témoignage — {{ personne.prenom }} {{ personne.nom }} — CamerAlert{% endblock %}
 
 {% block contenu %}
 <div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="form-card text-center animate-in">
-                <div class="auth-icon" style="background:var(--vert-clair);color:var(--vert-fonce)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-chat-left-quote-fill" viewBox="0 0 16 16">
-                      <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2zm7.194 2.766a1.688 1.688 0 0 0-.227-.272 1.467 1.467 0 0 0-.469-.324l-.008-.004A1.785 1.785 0 0 0 5.734 2C4.776 2 4 2.749 4 3.667c0 .92.776 1.666 1.734 1.666.343 0 .662-.095.931-.26-.137.389-.39.804-.81 1.22a.405.405 0 0 0 .011.59c.173.16.447.155.614-.01 1.334-1.329 1.37-2.758.941-3.706a2.461 2.461 0 0 0-.227-.4zM11 2c-.958 0-1.734.749-1.734 1.667 0 .92.776 1.666 1.734 1.666.343 0 .662-.095.931-.26-.137.389-.39.804-.81 1.22a.405.405 0 0 0 .011.59c.173.16.447.155.614-.01 1.334-1.329 1.37-2.758.941-3.706a2.461 2.461 0 0 0-.227-.4 1.688 1.688 0 0 0-.227-.272 1.467 1.467 0 0 0-.469-.324l-.008-.004A1.785 1.785 0 0 0 11 2z"/>
-                    </svg>
+
+    <!-- Fil d'Ariane -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'accueil' %}" class="text-danger text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'liste_cas' %}" class="text-danger text-decoration-none">Avis de recherche</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'detail_cas' personne.pk %}" class="text-danger text-decoration-none">{{ personne.prenom }} {{ personne.nom }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Témoigner</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+
+        <!-- Colonne Gauche : Récapitulatif Personne Disparue & Sécurité -->
+        <div class="col-lg-4">
+            
+            <!-- Fiche Personne -->
+            <div class="card border-0 shadow-sm overflow-hidden mb-4" style="border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <span class="badge bg-danger fw-bold px-2 py-1" style="font-size:11px;">RECHERCHE EN COURS</span>
+                    <span class="text-muted small">Réf. {{ personne.reference|default:"CA-2026" }}</span>
                 </div>
-                <h4 class="fw-semibold mb-1">Soumettre un témoignage</h4>
-                <p class="text-muted small mb-4">
-                    Concernant : <strong>{{ personne.prenom }} {{ personne.nom }}</strong>
-                </p>
-                <form method="POST" class="text-start">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="text-danger small mt-1">
-                                    {{ field.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    <button class="btn btn-danger w-100 mt-2 py-2">
-                        Envoyer le témoignage
-                    </button>
-                </form>
-                <div class="mt-4 small">
-                    <a href="{% url 'detail_cas' personne.pk %}" class="text-muted text-decoration-none">
-                        ← Retour au cas
+
+                <div class="p-3 d-flex gap-3 align-items-center">
+                    <div style="width: 80px; height: 80px; min-width: 80px; border-radius: 12px; overflow: hidden; background: #eee;">
+                        {% if personne.photo %}
+                            <img src="{{ personne.photo.url }}" alt="{{ personne.prenom }} {{ personne.nom }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted fw-bold fs-4">
+                                {{ personne.prenom|first }}{{ personne.nom|first }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="overflow-hidden">
+                        <h5 class="fw-bold mb-1 text-truncate">{{ personne.prenom }} {{ personne.nom }}</h5>
+                        <div class="text-muted small">{{ personne.age }} ans · {{ personne.get_sexe_display }}</div>
+                        <div class="text-danger small fw-semibold">📍 {{ personne.ville }}, {{ personne.region }}</div>
+                    </div>
+                </div>
+
+                <div class="p-3 border-top bg-light-subtle d-flex justify-content-between align-items-center">
+                    <span class="small text-muted">Disparu(e) le {{ personne.date_disparition|date:"d/m/Y" }}</span>
+                    <a href="{% url 'detail_cas' personne.pk %}" class="btn btn-outline-danger btn-sm py-1 px-2 fw-semibold" style="font-size:11px;">
+                        Voir l'avis complet →
                     </a>
                 </div>
             </div>
+
+            <!-- Carte Garantie Confidentialité -->
+            <div class="card border-0 shadow-sm p-4" style="border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="fs-4">🔒</span>
+                    <h6 class="fw-bold mb-0">Confidentialité garantie</h6>
+                </div>
+                <p class="text-muted small mb-3">
+                    Votre sécurité et votre sérénité sont notre priorité absolue.
+                </p>
+                <ul class="list-unstyled small d-flex flex-column gap-2 mb-0 text-muted">
+                    <li class="d-flex align-items-start gap-2">
+                        <span class="text-success fw-bold">✓</span>
+                        <span>Votre numéro n'est <strong>jamais publié</strong> sur le site.</span>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <span class="text-success fw-bold">✓</span>
+                        <span>Seuls les modérateurs et référents d'enquête y ont accès.</span>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <span class="text-success fw-bold">✓</span>
+                        <span>Vous pouvez rester anonyme en ne mentionnant pas votre nom complet.</span>
+                    </li>
+                </ul>
+            </div>
+
         </div>
+
+        <!-- Colonne Droite : Formulaire Témoignage -->
+        <div class="col-lg-8">
+            <div class="form-card border-0 shadow-sm animate-in" style="border-radius: 20px; border: 1px solid var(--border-color) !important;">
+                
+                <div class="border-bottom pb-3 mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-success-subtle text-success px-2 py-0.5 fw-bold" style="font-size:11px;">AIDE CITOYENNE</span>
+                        <span class="text-muted small">Contribution civique</span>
+                    </div>
+                    <h2 class="fw-bold mb-1">Transmettre un témoignage</h2>
+                    <p class="text-muted small mb-0">
+                        Avez-vous aperçu cette personne ou disposez-vous d'un indice ? Partagez ce que vous savez pour aider les proches.
+                    </p>
+                </div>
+
+                <form method="POST" id="form-temoignage" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        
+                        <!-- LIEU D'OBSERVATION -->
+                        <div class="col-md-7">
+                            <label class="form-label small fw-bold">{{ form.lieu.label }} <span class="text-danger">*</span></label>
+                            {{ form.lieu }}
+                            {% if form.lieu.errors %}<div class="text-danger small mt-1">{{ form.lieu.errors }}</div>{% endif %}
+                        </div>
+
+                        <!-- DATE D'OBSERVATION -->
+                        <div class="col-md-5">
+                            <label class="form-label small fw-bold">{{ form.date_observation.label }} <span class="text-danger">*</span></label>
+                            {{ form.date_observation }}
+                            {% if form.date_observation.errors %}<div class="text-danger small mt-1">{{ form.date_observation.errors }}</div>{% endif %}
+                        </div>
+
+                        <!-- MESSAGE / OBSERVATIONS -->
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">{{ form.message.label }} <span class="text-danger">*</span></label>
+                            {{ form.message }}
+                            {% if form.message.errors %}<div class="text-danger small mt-1">{{ form.message.errors }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-12 my-2">
+                            <hr class="opacity-10">
+                        </div>
+
+                        <!-- IDENTITÉ TÉMOIN -->
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">{{ form.auteur_nom.label }}</label>
+                            {{ form.auteur_nom }}
+                            {% if form.auteur_nom.errors %}<div class="text-danger small mt-1">{{ form.auteur_nom.errors }}</div>{% endif %}
+                        </div>
+
+                        <!-- TÉLÉPHONE TÉMOIN -->
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">{{ form.auteur_telephone.label }} <span class="text-danger">*</span></label>
+                            {{ form.auteur_telephone }}
+                            <div class="form-text text-muted small">Ce numéro reste strictly confidentiel.</div>
+                            {% if form.auteur_telephone.errors %}<div class="text-danger small mt-1">{{ form.auteur_telephone.errors }}</div>{% endif %}
+                        </div>
+
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="btn btn-danger w-100 py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" style="font-size:16px; border-radius:12px;" id="btn-submit-temoignage">
+                            <span>🤝 Transmettre mon témoignage</span>
+                        </button>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'detail_cas' personne.pk %}" class="text-muted small text-decoration-none">
+                                ← Annuler et retourner à la fiche
+                            </a>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
     </div>
+
 </div>
+
+<script>
+    const formTemoignage = document.getElementById('form-temoignage');
+    const btnSubmit = document.getElementById('btn-submit-temoignage');
+    if (formTemoignage && btnSubmit) {
+        formTemoignage.addEventListener('submit', function() {
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Envoi sécurisé...`;
+        });
+    }
+</script>
 {% endblock %}

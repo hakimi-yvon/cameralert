@@ -5,57 +5,107 @@
 {% block contenu %}
 <div class="container py-4">
 
-    <!-- Fil d'ariane -->
-    <nav class="mb-4" aria-label="breadcrumb">
+    <!-- Fil d'Ariane -->
+    <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb small">
             <li class="breadcrumb-item"><a href="{% url 'accueil' %}" class="text-danger text-decoration-none">Accueil</a></li>
             <li class="breadcrumb-item active" aria-current="page">Mes signalements</li>
         </ol>
     </nav>
 
+    <!-- En-tête avec Actions -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h2 class="fw-bold mb-1">Mes signalements</h2>
-            <p class="text-muted small mb-0">Suivez le statut de traitement et gérez les avis de recherche que vous avez déposés.</p>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-danger-subtle text-danger px-2.5 py-1 fw-bold" style="font-size:11px;">ESPACE CITOYEN</span>
+                <span class="text-muted small">Suivi personnalisé</span>
+            </div>
+            <h1 class="h2 fw-bold mb-1">Mes avis de recherche déposés</h1>
+            <p class="text-muted small mb-0">
+                Consultez le statut en temps réel de vos signalements, téléchargez vos affiches A4 et mettez à jour la situation.
+            </p>
         </div>
-        <a href="{% url 'signaler' %}" class="btn btn-danger btn-sm px-3 py-2 fw-semibold">
-            + Déposer un nouveau signalement
+
+        <a href="{% url 'signaler' %}" class="btn btn-danger px-3 py-2 fw-bold shadow-sm d-flex align-items-center gap-2">
+            <span>+ Déposer un nouvel avis</span>
         </a>
     </div>
 
+    <!-- Métriques Clés Personnelles -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius:16px; background:var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="text-muted small fw-semibold mb-1">Total signalés</div>
+                <div class="h3 fw-bold mb-0 text-dark-emphasis">{{ cas_list|length }}</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius:16px; background:var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="text-muted small fw-semibold mb-1">En examen</div>
+                <div class="h3 fw-bold mb-0 text-warning">{{ nb_attente }}</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius:16px; background:var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="text-muted small fw-semibold mb-1">Recherches actives</div>
+                <div class="h3 fw-bold mb-0 text-danger">{{ nb_actifs }}</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius:16px; background:var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="text-muted small fw-semibold mb-1">Retrouvé(e)s</div>
+                <div class="h3 fw-bold mb-0 text-success">{{ nb_retrouves }}</div>
+            </div>
+        </div>
+    </div>
+
     {% if cas_list %}
-        <div class="row g-4">
+        <!-- Filtres par statut -->
+        <div class="d-flex gap-2 mb-4 overflow-auto pb-1" id="filter-buttons">
+            <button class="btn btn-sm btn-danger active px-3 filter-btn" data-filter="all">Tous ({{ cas_list|length }})</button>
+            <button class="btn btn-sm btn-outline-secondary px-3 filter-btn" data-filter="en_recherche">Actifs ({{ nb_actifs }})</button>
+            <button class="btn btn-sm btn-outline-secondary px-3 filter-btn" data-filter="en_attente">En examen ({{ nb_attente }})</button>
+            <button class="btn btn-sm btn-outline-secondary px-3 filter-btn" data-filter="retrouvee">Résolus ({{ nb_retrouves }})</button>
+        </div>
+
+        <div class="row g-4" id="cases-container">
             {% for cas in cas_list %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm h-100 overflow-hidden border-0" style="border-radius:16px; background: var(--bg-card);">
+            <div class="col-md-6 col-lg-4 case-item" data-status="{{ cas.statut }}">
+                <div class="card border-0 shadow-sm h-100 overflow-hidden d-flex flex-column" 
+                     style="border-radius: 18px; background: var(--bg-card); border: 1px solid var(--border-color) !important; transition: transform 0.2s ease, box-shadow 0.2s ease;">
                     
-                    <!-- En-tête statut & référence -->
-                    <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
-                        <span class="fw-semibold small text-muted">Réf. {{ cas.reference|default:"CA-2026" }}</span>
+                    <!-- En-tête Statut & Référence -->
+                    <div class="p-3 d-flex justify-content-between align-items-center border-bottom bg-light-subtle">
+                        <span class="fw-bold small text-muted font-monospace" style="font-size:11px;">RÉF : {{ cas.reference|default:"CA-2026" }}</span>
                         {% if cas.statut == 'en_attente' %}
-                            <span class="badge bg-warning text-dark px-2 py-1">⏳ En cours d'examen</span>
+                            <span class="badge bg-warning text-dark px-2.5 py-1 fw-bold" style="font-size:11px;">⏳ En cours d'examen</span>
                         {% elif cas.statut == 'en_recherche' %}
-                            <span class="badge bg-danger px-2 py-1">🚨 Recherche active</span>
+                            <span class="badge bg-danger px-2.5 py-1 fw-bold d-inline-flex align-items-center gap-1" style="font-size:11px;">
+                                <span class="pulse-dot"></span> Recherche active
+                            </span>
                         {% elif cas.statut == 'retrouvee' %}
-                            <span class="badge bg-success px-2 py-1">✅ Retrouvé(e)</span>
+                            <span class="badge bg-success px-2.5 py-1 fw-bold" style="font-size:11px;">✅ Retrouvé(e)</span>
                         {% elif cas.statut == 'rejete' %}
-                            <span class="badge bg-secondary px-2 py-1">❌ Non publié</span>
+                            <span class="badge bg-secondary px-2.5 py-1 fw-bold" style="font-size:11px;">❌ Non publié</span>
                         {% endif %}
                     </div>
 
-                    <div class="p-3 d-flex gap-3">
-                        <!-- Vignette Photo -->
-                        <div style="width:84px; height:84px; min-width:84px; border-radius:10px; overflow:hidden; background:#f0f0f0;" class="d-flex align-items-center justify-content-center">
+                    <!-- Contenu : Photo + Informations -->
+                    <div class="p-3 d-flex gap-3 align-items-start">
+                        <!-- Photo / Monogramme -->
+                        <div style="width: 80px; height: 80px; min-width: 80px; border-radius: 12px; overflow: hidden; background: #eee;">
                             {% if cas.photo %}
-                                <img src="{{ cas.photo.url }}" alt="{{ cas.prenom }} {{ cas.nom }}" style="width:100%; height:100%; object-fit:cover;">
+                                <img src="{{ cas.photo.url }}" alt="{{ cas.prenom }} {{ cas.nom }}" style="width: 100%; height: 100%; object-fit: cover;">
                             {% else %}
-                                <span class="fw-bold text-muted fs-4">{{ cas.prenom|first }}{{ cas.nom|first }}</span>
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted fw-bold fs-4">
+                                    {{ cas.prenom|first }}{{ cas.nom|first }}
+                                </div>
                             {% endif %}
                         </div>
 
-                        <!-- Infos résumées -->
-                        <div class="overflow-hidden">
-                            <h5 class="fw-bold mb-1 text-truncate">{{ cas.prenom }} {{ cas.nom }}</h5>
+                        <!-- Nom & Détails -->
+                        <div class="overflow-hidden flex-grow-1">
+                            <h5 class="fw-bold mb-1 text-truncate text-dark-emphasis">{{ cas.prenom }} {{ cas.nom }}</h5>
                             <div class="text-muted small mb-1">{{ cas.age }} ans · {{ cas.get_sexe_display }}</div>
                             <div class="text-muted small text-truncate">📍 {{ cas.ville }}, {{ cas.region }}</div>
                             <div class="text-secondary small mt-1" style="font-size:11px;">
@@ -64,42 +114,42 @@
                         </div>
                     </div>
 
-                    <!-- Note contextuelle selon le statut -->
+                    <!-- Message d'information contextuel -->
                     <div class="px-3 pb-3">
                         {% if cas.statut == 'en_attente' %}
-                            <div class="p-2 rounded-3 bg-light border small text-muted">
-                                ℹ️ Notre équipe modère ce signalement. Vous recevrez un e-mail dès qu'il sera validé et diffusé.
+                            <div class="p-2.5 rounded-3 border small text-muted" style="background: rgba(255,193,7,0.06); font-size:12px;">
+                                ℹ️ Notre équipe modère les informations. Dès validation, l'alerte sera diffusée en ligne et sur les réseaux.
                             </div>
                         {% elif cas.statut == 'en_recherche' %}
-                            <div class="p-2 rounded-3 small border-success" style="background: rgba(40,167,69,0.06); color: #28a745;">
-                                📢 Visible du public. Partagez l'affiche pour accélérer les recherches.
+                            <div class="p-2.5 rounded-3 border-success small" style="background: rgba(40,167,69,0.06); color: #28a745; font-size:12px;">
+                                📢 Avis en ligne et public. Imprimez l'affiche pour placarder dans votre quartier.
                             </div>
                         {% elif cas.statut == 'retrouvee' %}
-                            <div class="p-2 rounded-3 small bg-light text-muted">
-                                🎉 Les recherches ont été clôturées avec succès.
+                            <div class="p-2.5 rounded-3 border small text-muted" style="background: rgba(108,117,125,0.06); font-size:12px;">
+                                🎉 La personne a été retrouvée saine et sauve. Le dossier est classé.
                             </div>
                         {% elif cas.statut == 'rejete' %}
-                            <div class="p-2 rounded-3 small bg-light text-danger">
-                                ⚠️ Informations incomplètes ou non conformes. Vous pouvez nous contacter ou soumettre une nouvelle fiche.
+                            <div class="p-2.5 rounded-3 border small text-danger" style="background: rgba(220,53,69,0.06); font-size:12px;">
+                                ⚠️ Dossier incomplet ou non vérifiable. Vous pouvez soumettre une nouvelle demande détaillée.
                             </div>
                         {% endif %}
                     </div>
 
-                    <!-- Boutons d'action -->
-                    <div class="card-footer bg-transparent border-top p-3 d-flex flex-column gap-2 mt-auto">
+                    <!-- Actions en pied de carte -->
+                    <div class="card-footer bg-transparent border-top p-3 mt-auto d-flex flex-column gap-2">
                         <div class="d-flex gap-2">
-                            <a href="{% url 'detail_cas' cas.pk %}" class="btn btn-outline-danger btn-sm w-100 fw-semibold">
-                                Voir la fiche
+                            <a href="{% url 'detail_cas' cas.pk %}" class="btn btn-outline-danger btn-sm w-100 fw-bold py-1.5" style="border-radius:8px;">
+                                Consulter l'avis
                             </a>
-                            <a href="{% url 'affiche_cas' cas.pk %}" target="_blank" class="btn btn-outline-dark btn-sm w-100 fw-semibold" title="Ouvrir l'affiche A4 imprimable">
+                            <a href="{% url 'affiche_cas' cas.pk %}" target="_blank" class="btn btn-outline-dark btn-sm w-100 fw-bold py-1.5" style="border-radius:8px;" title="Générer l'affiche A4 prête à imprimer">
                                 🖨️ Affiche A4
                             </a>
                         </div>
 
                         {% if cas.statut == 'en_recherche' %}
-                        <form method="POST" action="{% url 'marquer_retrouve' cas.pk %}" onsubmit="return confirm('Confirmez-vous que {{ cas.prenom }} a été retrouvé(e) ?');" class="m-0">
+                        <form method="POST" action="{% url 'marquer_retrouve' cas.pk %}" onsubmit="return confirm('Confirmez-vous que {{ cas.prenom }} {{ cas.nom }} a été retrouvé(e) ? Cette action clôturera la recherche.');" class="m-0">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold">
+                            <button type="submit" class="btn btn-success btn-sm w-100 fw-bold py-1.5 shadow-sm" style="border-radius:8px;">
                                 ✓ Marquer comme retrouvé(e)
                             </button>
                         </form>
@@ -110,18 +160,50 @@
             </div>
             {% endfor %}
         </div>
+
     {% else %}
-        <div class="card shadow-sm p-5 text-center border-0" style="border-radius:16px;">
-            <div class="fs-1 mb-2">📋</div>
-            <h4 class="fw-bold mb-1">Aucun signalement déposé</h4>
-            <p class="text-muted small mb-4">Vous n'avez pas encore déposé d'avis de disparition depuis ce compte.</p>
+        <!-- État vide -->
+        <div class="card border-0 shadow-sm p-5 text-center my-4" style="border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color) !important;">
+            <div class="p-3 bg-danger-subtle text-danger rounded-circle d-inline-block mx-auto mb-3 fs-2">
+                📋
+            </div>
+            <h4 class="fw-bold mb-2">Vous n'avez déposé aucun signalement</h4>
+            <p class="text-muted small mb-4 mx-auto" style="max-width: 460px;">
+                Si un proche ou une connaissance a disparu, vous pouvez soumettre un avis dès maintenant. Notre équipe le vérifiera et le publiera en priorité.
+            </p>
             <div>
-                <a href="{% url 'signaler' %}" class="btn btn-danger px-4 py-2 fw-semibold">
-                    + Déposer un signalement
+                <a href="{% url 'signaler' %}" class="btn btn-danger px-4 py-2.5 fw-bold shadow-sm" style="border-radius:12px;">
+                    + Déposer un avis de disparition
                 </a>
             </div>
         </div>
     {% endif %}
 
 </div>
+
+<script>
+    // Filtrage interactif côté client
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const caseItems = document.querySelectorAll('.case-item');
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            filterButtons.forEach(b => {
+                b.classList.remove('btn-danger', 'active');
+                b.classList.add('btn-outline-secondary');
+            });
+            this.classList.remove('btn-outline-secondary');
+            this.classList.add('btn-danger', 'active');
+
+            const filterValue = this.getAttribute('data-filter');
+            caseItems.forEach(item => {
+                if (filterValue === 'all' || item.getAttribute('data-status') === filterValue) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

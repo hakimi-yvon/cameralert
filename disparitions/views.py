@@ -105,8 +105,14 @@ def affiche_cas(request, pk):
 def mes_signalements(request):
     """Espace personnel listant les signalements déposés par l'utilisateur connecté."""
     cas_list = PersonneDisparue.objects.filter(declarant=request.user).order_by('-date_creation')
+    nb_actifs = cas_list.filter(statut='en_recherche').count()
+    nb_attente = cas_list.filter(statut='en_attente').count()
+    nb_retrouves = cas_list.filter(statut='retrouvee').count()
     return render(request, 'disparitions/mes_signalements.html', {
-        'cas_list': cas_list
+        'cas_list': cas_list,
+        'nb_actifs': nb_actifs,
+        'nb_attente': nb_attente,
+        'nb_retrouves': nb_retrouves,
     })
 
 @login_required
@@ -168,7 +174,10 @@ def carte_disparitions(request):
     total_actifs = PersonneDisparue.objects.filter(statut='en_recherche').count()
     total_retrouves = PersonneDisparue.objects.filter(statut='retrouvee').count()
 
+    markers_sorted = sorted(markers, key=lambda x: x['total'], reverse=True)
+
     return render(request, 'disparitions/carte.html', {
+        'markers': markers_sorted,
         'markers_json': json.dumps(markers),
         'total_actifs': total_actifs,
         'total_retrouves': total_retrouves,
