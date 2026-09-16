@@ -12,8 +12,9 @@ urlpatterns = [
     path('cas/<int:pk>/', views.detail_cas, name='detail_cas'),
     path('cas/<int:pk>/affiche/', views.affiche_cas, name='affiche_cas'),
 
-    # Signaler une disparition
+    # Signaler une disparition & Espace déclarant
     path('signaler/', views.signaler, name='signaler'),
+    path('mes-signalements/', views.mes_signalements, name='mes_signalements'),
 
     # Marquer comme retrouvée (admin)
     path('cas/<int:pk>/retrouve/', views.marquer_retrouve, name='marquer_retrouve'),

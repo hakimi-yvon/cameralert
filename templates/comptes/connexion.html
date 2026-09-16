@@ -23,7 +23,12 @@
                             {{ field }}
                         </div>
                     {% endfor %}
-                    <button class="btn btn-danger w-100 mt-2 py-2">
+                    <div class="d-flex justify-content-end mb-3">
+                        <a href="{% url 'password_reset' %}" class="small text-muted text-decoration-none">
+                            Mot de passe oublié ?
+                        </a>
+                    </div>
+                    <button class="btn btn-danger w-100 mt-2 py-2 fw-semibold">
                         Se connecter
                     </button>
                 </form>

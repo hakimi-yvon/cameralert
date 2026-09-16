@@ -102,6 +102,14 @@ def affiche_cas(request, pk):
     })
 
 @login_required
+def mes_signalements(request):
+    """Espace personnel listant les signalements déposés par l'utilisateur connecté."""
+    cas_list = PersonneDisparue.objects.filter(declarant=request.user).order_by('-date_creation')
+    return render(request, 'disparitions/mes_signalements.html', {
+        'cas_list': cas_list
+    })
+
+@login_required
 def signaler(request):
     if request.method == 'POST':
         form = PersonneDisparueForm(request.POST, request.FILES)
