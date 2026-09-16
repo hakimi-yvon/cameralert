@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block titre %}Page introuvable (404) — CamerAlert{% endblock %}
+
+{% block contenu %}
+<div class="container py-5">
+    <div class="row justify-content-center text-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card shadow-sm p-5 border-0" style="border-radius:18px;">
+                <div class="display-1 fw-bold text-danger mb-2">404</div>
+                <h3 class="fw-bold mb-2">Page introuvable</h3>
+                <p class="text-muted small mb-4">
+                    La page ou le signalement que vous recherchez n'existe pas ou a été déplacé.
+                </p>
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <a href="{% url 'accueil' %}" class="btn btn-danger px-4 py-2 fw-semibold">
+                        Accueil CamerAlert
+                    </a>
+                    <a href="{% url 'liste_cas' %}" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
+                        Tous les avis de recherche
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

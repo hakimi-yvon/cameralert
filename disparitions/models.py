@@ -98,8 +98,7 @@ class PersonneDisparue(models.Model):
         # Si la fiche est nouvelle et n'a pas encore de référence
         if not self.reference:
             from datetime import date
-            from django.db.models import Max
-            import re
+            from django.db import IntegrityError
 
             annee = date.today().year
             prefix = f"CA-{annee}-"
@@ -115,14 +114,24 @@ class PersonneDisparue(models.Model):
                     num = int(ref[len(prefix):])
                     if num > max_num:
                         max_num = num
-                except ValueError:
+                except (ValueError, TypeError):
                     pass
 
-            # On génère la référence : CA-2026-0001
             self.reference = f"{prefix}{max_num + 1:04d}"
 
-        # On sauvegarde normalement
-        super().save(*args, **kwargs)
+            try:
+                super().save(*args, **kwargs)
+            except IntegrityError:
+                # En cas de collision concurrente, recharger le numéro le plus élevé
+                existants = PersonneDisparue.objects.filter(
+                    reference__startswith=prefix
+                ).values_list('reference', flat=True)
+                nums = [int(r[len(prefix):]) for r in existants if r[len(prefix):].isdigit()]
+                max_num = max(nums) if nums else 0
+                self.reference = f"{prefix}{max_num + 1:04d}"
+                super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
 
     @property
     def telephone_contact_wa(self):

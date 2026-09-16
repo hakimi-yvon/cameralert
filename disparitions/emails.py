@@ -53,8 +53,11 @@ def envoyer_email_rejet(cas, request):
     if not destinataire:
         return
 
+    url_signaler = request.build_absolute_uri('/signaler/')
+
     contexte = {
         'cas': cas,
+        'url_signaler': url_signaler,
         'prenom_declarant': cas.declarant.first_name or cas.declarant.username,
     }
 
