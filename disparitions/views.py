@@ -92,6 +92,15 @@ def detail_cas(request, pk):
         'temoignages': temoignages,
     })
 
+def affiche_cas(request, pk):
+    """Affiche A4 imprimable et partageable haute définition avec QR Code."""
+    cas = get_object_or_404(PersonneDisparue, pk=pk)
+    url_fiche = request.build_absolute_uri(f'/cas/{cas.pk}/')
+    return render(request, 'disparitions/affiche_cas.html', {
+        'cas': cas,
+        'url_fiche': url_fiche,
+    })
+
 @login_required
 def signaler(request):
     if request.method == 'POST':

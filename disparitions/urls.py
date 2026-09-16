@@ -8,8 +8,9 @@ urlpatterns = [
     # Liste de tous les cas
     path('cas/', views.liste_cas, name='liste_cas'),
 
-    # Détail d'un cas
+    # Détail d'un cas & Affiche imprimable
     path('cas/<int:pk>/', views.detail_cas, name='detail_cas'),
+    path('cas/<int:pk>/affiche/', views.affiche_cas, name='affiche_cas'),
 
     # Signaler une disparition
     path('signaler/', views.signaler, name='signaler'),
