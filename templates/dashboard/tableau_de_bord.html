@@ -50,9 +50,12 @@
             <a href="{% url 'admin:index' %}" class="nav-item">
                 <span class="nav-dot"></span>Administration
             </a>
-            <a href="{% url 'deconnexion' %}" class="nav-item">
-                <span class="nav-dot"></span>Se déconnecter
-            </a>
+            <form method="POST" action="{% url 'deconnexion' %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="nav-item border-0 w-100 text-start bg-transparent" style="cursor:pointer;">
+                    <span class="nav-dot"></span>Se déconnecter
+                </button>
+            </form>
         </div>
 
         <div class="sidebar-bottom">
@@ -140,15 +143,19 @@
                                     {{ cas.region }} · 
                                     Soumis le {{ cas.date_creation|date:"d/m/Y" }}
                                 </div>
-                                <div class="case-actions">
-                                    <a href="{% url 'valider_cas' cas.pk %}" 
-                                       class="btn-approve">
-                                        Approuver
-                                    </a>
-                                    <a href="{% url 'rejeter_cas' cas.pk %}" 
-                                       class="btn-reject">
-                                        Rejeter
-                                    </a>
+                                <div class="case-actions d-flex align-items-center gap-2">
+                                    <form method="POST" action="{% url 'valider_cas' cas.pk %}" class="d-inline m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-approve border-0" style="cursor:pointer;">
+                                            Approuver
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{% url 'rejeter_cas' cas.pk %}" class="d-inline m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-reject border-0" style="cursor:pointer;" onclick="return confirm('Voulez-vous rejeter ce cas ?');">
+                                            Rejeter
+                                        </button>
+                                    </form>
                                     <a href="{% url 'detail_cas' cas.pk %}" 
                                        class="btn-view">
                                         Voir le détail
@@ -185,16 +192,19 @@
                                     Lieu : {{ t.lieu }} · Obs : {{ t.date_observation|date:"d/m/Y" }} · Tél : {{ t.auteur_telephone }}
                                 </div>
                                 <p class="mb-2 text-sm text-secondary">{{ t.message }}</p>
-                                <div class="case-actions">
-                                    <a href="{% url 'valider_temoignage' t.pk %}" 
-                                       class="btn-approve">
-                                        Valider
-                                    </a>
-                                    <a href="{% url 'supprimer_temoignage' t.pk %}" 
-                                       class="btn-reject"
-                                       onclick="return confirm('Voulez-vous supprimer ce témoignage ?');">
-                                        Supprimer
-                                    </a>
+                                <div class="case-actions d-flex align-items-center gap-2">
+                                    <form method="POST" action="{% url 'valider_temoignage' t.pk %}" class="d-inline m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-approve border-0" style="cursor:pointer;">
+                                            Valider
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{% url 'supprimer_temoignage' t.pk %}" class="d-inline m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-reject border-0" style="cursor:pointer;" onclick="return confirm('Voulez-vous supprimer ce témoignage ?');">
+                                            Supprimer
+                                        </button>
+                                    </form>
                                     <a href="{% url 'detail_cas' t.personne.pk %}" 
                                        class="btn-view">
                                         Voir le cas

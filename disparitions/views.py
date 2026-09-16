@@ -157,7 +157,10 @@ def carte_disparitions(request):
         'total_retrouves': total_retrouves,
     })
 
+from django.views.decorators.http import require_POST
+
 @login_required
+@require_POST
 def marquer_retrouve(request, pk):
     cas = get_object_or_404(PersonneDisparue, pk=pk)
     
@@ -173,6 +176,7 @@ def marquer_retrouve(request, pk):
     return redirect('detail_cas', pk=pk)
 
 @staff_member_required
+@require_POST
 def valider_cas(request, pk):
     cas = get_object_or_404(PersonneDisparue, pk=pk)
     cas.statut = 'en_recherche'
@@ -185,6 +189,7 @@ def valider_cas(request, pk):
     return redirect('dashboard')
 
 @staff_member_required
+@require_POST
 def rejeter_cas(request, pk):
     cas = get_object_or_404(PersonneDisparue, pk=pk)
     cas.statut = 'rejete'

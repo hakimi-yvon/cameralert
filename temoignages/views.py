@@ -28,7 +28,10 @@ def soumettre(request, personne_id):
         'personne': personne
     })
 
+from django.views.decorators.http import require_POST
+
 @staff_member_required
+@require_POST
 def valider_temoignage(request, pk):
     temoignage = get_object_or_404(Temoignage, pk=pk)
     temoignage.est_valide = True
@@ -37,6 +40,7 @@ def valider_temoignage(request, pk):
     return redirect('dashboard')
 
 @staff_member_required
+@require_POST
 def supprimer_temoignage(request, pk):
     temoignage = get_object_or_404(Temoignage, pk=pk)
     temoignage.delete()

@@ -29,6 +29,10 @@ def connexion(request):
 
     return render(request, 'comptes/connexion.html', {'form': form})
 
+from django.views.decorators.http import require_http_methods
+
+@require_http_methods(["GET", "POST"])
 def deconnexion(request):
     logout(request)
+    messages.info(request, 'Vous avez été déconnecté.')
     return redirect('accueil')

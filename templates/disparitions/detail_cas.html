@@ -119,9 +119,12 @@
                 <div class="card shadow-sm p-3 mb-3 border-success" style="border-radius:14px; background: rgba(40,167,69,0.05);">
                     <div class="fw-bold text-success mb-1">🎉 La personne a été retrouvée ?</div>
                     <p class="text-muted small mb-2">Clôturez les recherches pour informer la communauté.</p>
-                    <a href="{% url 'marquer_retrouve' cas.pk %}" class="btn btn-success btn-sm w-100" onclick="return confirm('Confirmez-vous que la personne a été retrouvée ?');">
-                        Marquer comme retrouvée
-                    </a>
+                    <form method="POST" action="{% url 'marquer_retrouve' cas.pk %}" onsubmit="return confirm('Confirmez-vous que la personne a été retrouvée ?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm w-100">
+                            Marquer comme retrouvée
+                        </button>
+                    </form>
                 </div>
                 {% endif %}
             {% endif %}
