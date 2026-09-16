@@ -60,6 +60,14 @@ class PersonneDisparue(models.Model):
     vetements = models.CharField(max_length=255, blank=True)
     description = models.TextField()
 
+    # Contact d'urgence pour les témoins
+    telephone_contact = models.CharField(
+        max_length=30,
+        blank=True,
+        verbose_name="Téléphone d'urgence (famille / enquêteur)",
+        help_text="Numéro joignable directement par les témoins (Orange, MTN, WhatsApp...)"
+    )
+
     # Photo
     photo = models.ImageField(
         upload_to='disparitions/', 
@@ -115,6 +123,16 @@ class PersonneDisparue(models.Model):
 
         # On sauvegarde normalement
         super().save(*args, **kwargs)
+
+    @property
+    def telephone_contact_wa(self):
+        """Retourne le numéro nettoyé pour les liens wa.me (chiffres uniquement avec indicatif 237 si absent)."""
+        if not self.telephone_contact:
+            return ""
+        digits = ''.join(c for c in self.telephone_contact if c.isdigit())
+        if len(digits) == 9:
+            return f"237{digits}"
+        return digits
 
     def __str__(self):
         return f"{self.prenom} {self.nom} - {self.region}"

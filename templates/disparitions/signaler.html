@@ -114,6 +114,12 @@
                             {% if form.ville.errors %}<div class="text-danger small mt-1">{{ form.ville.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-12">
+                            <label class="form-label fw-semibold">Téléphone d'urgence (famille / proche)</label>
+                            {{ form.telephone_contact }}
+                            <div class="form-text text-muted small">Ce numéro sera affiché publiquement sur la fiche pour que les personnes qui reconnaissent le proche puissent vous contacter directement.</div>
+                            {% if form.telephone_contact.errors %}<div class="text-danger small mt-1">{{ form.telephone_contact.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-12">
                             <label class="form-label fw-semibold">Circonstances détaillées de la disparition <span class="text-danger">*</span></label>
                             {{ form.description }}
                             {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors }}</div>{% endif %}

@@ -2,7 +2,24 @@
 
 {% block titre %}{{ cas.prenom }} {{ cas.nom }} — Avis de Disparition | CamerAlert{% endblock %}
 
-{% block contenu %}
+{% block extra_meta %}
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="CamerAlert">
+<meta property="og:title" content="🚨 AVIS DE RECHERCHE : {{ cas.prenom }} {{ cas.nom }} ({{ cas.age }} ans) — CamerAlert">
+<meta property="og:description" content="URGENT : Disparu(e) à {{ cas.ville }}, région du {{ cas.region }} depuis le {{ cas.date_disparition|date:'d F Y' }}. En cas d'information, contactez {% if cas.telephone_contact %}le {{ cas.telephone_contact }}{% else %}le 117 / 1500{% endif %}. Partagez massivement.">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% if cas.photo %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ cas.photo.url }}">
+<meta property="og:image:secure_url" content="{{ request.scheme }}://{{ request.get_host }}{{ cas.photo.url }}">
+<meta property="og:image:alt" content="Photo de {{ cas.prenom }} {{ cas.nom }}">
+{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🚨 AVIS DE RECHERCHE : {{ cas.prenom }} {{ cas.nom }} ({{ cas.age }} ans)">
+<meta name="twitter:description" content="Disparu(e) à {{ cas.ville }}, région du {{ cas.region }}. Cliquez pour voir la fiche officielle.">
+{% if cas.photo %}
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ cas.photo.url }}">
+{% endif %}
+{% endblock %}
 <div class="container py-4">
 
     <!-- Fil d'ariane -->
@@ -209,15 +226,42 @@
                 </div>
             </div>
 
-            <!-- Soumettre un témoignage -->
-            <div class="card shadow-sm p-4 mb-4 border-danger" style="border-radius:16px; background: var(--bg-card);">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <div>
-                        <h4 class="fw-bold text-danger mb-1">Vous avez des informations ?</h4>
-                        <p class="text-muted small mb-0">Toute observation, même minime, peut sauver une vie.</p>
+            <!-- Contact d'urgence direct & Témoignage -->
+            <div class="card shadow-sm p-4 mb-4 border-danger" style="border-radius:16px; background: linear-gradient(135deg, rgba(226,75,74,0.08) 0%, rgba(226,75,74,0.02) 100%);">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="fs-4">🚨</span>
+                    <h5 class="fw-bold text-danger mb-0">Vous reconnaissez cette personne ?</h5>
+                </div>
+                <p class="text-muted small mb-3">
+                    Si vous l'avez aperçue récemment ou si vous disposez d'un indice crucial, réagissez immédiatement.
+                </p>
+
+                {% if cas.telephone_contact %}
+                <div class="row g-2 mb-3">
+                    <div class="col-sm-6">
+                        <a href="tel:{{ cas.telephone_contact }}" class="btn btn-danger w-100 py-2 d-flex align-items-center justify-content-center gap-2 fw-semibold shadow-sm text-truncate">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/>
+                            </svg>
+                            <span>Appeler : {{ cas.telephone_contact }}</span>
+                        </a>
                     </div>
-                    <a href="{% url 'soumettre_temoignage' cas.pk %}" class="btn btn-danger px-4 py-2">
-                        💬 Déposer un témoignage
+                    {% if cas.telephone_contact_wa %}
+                    <div class="col-sm-6">
+                        <a href="https://wa.me/{{ cas.telephone_contact_wa }}?text=Bonjour,%20je%20vous%20contacte%20concernant%20l'avis%20de%20recherche%20de%20{{ cas.prenom|urlencode }}%20{{ cas.nom|urlencode }}%20diffus%C3%A9%20sur%20CamerAlert." target="_blank" rel="noopener noreferrer" class="btn btn-success w-100 py-2 d-flex align-items-center justify-content-center gap-2 fw-semibold shadow-sm">
+                            <span>💬 Message WhatsApp</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top">
+                    <div class="small text-muted">
+                        Forces de l'ordre : <strong>Police 117</strong> · <strong>Gendarmerie 1500 / 113</strong>
+                    </div>
+                    <a href="{% url 'soumettre_temoignage' cas.pk %}" class="btn btn-outline-danger btn-sm px-3 fw-semibold">
+                        💬 Déposer un témoignage en ligne
                     </a>
                 </div>
             </div>

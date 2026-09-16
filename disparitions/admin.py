@@ -2,11 +2,18 @@ from django.contrib import admin
 from .models import PersonneDisparue
 
 
+from .emails import envoyer_email_validation
+
 def valider_cas(modeladmin, request, queryset):
-    queryset.update(statut='en_recherche')
+    count = 0
+    for cas in queryset:
+        cas.statut = 'en_recherche'
+        cas.save()
+        envoyer_email_validation(cas, request)
+        count += 1
     modeladmin.message_user(
         request, 
-        f"{queryset.count()} cas validé(s) et publié(s) avec succès."
+        f"{count} cas validé(s) et publié(s) avec succès (avec notification email aux déclarants)."
     )
 valider_cas.short_description = "Valider et publier les cas sélectionnés"
 
@@ -20,6 +27,7 @@ class PersonneDisparueAdmin(admin.ModelAdmin):
         'prenom', 
         'age',
         'region', 
+        'telephone_contact',
         'date_disparition',
         'statut',
         'date_creation'
@@ -40,7 +48,8 @@ class PersonneDisparueAdmin(admin.ModelAdmin):
         'nom', 
         'prenom', 
         'region', 
-        'ville'
+        'ville',
+        'telephone_contact'
     ]
 
     # Champs non modifiables
@@ -58,7 +67,7 @@ class PersonneDisparueAdmin(admin.ModelAdmin):
                 'nom', 
                 'prenom', 
                 'age', 
-                'sexe',
+                'sexe', 
                 'categorie',
                 'photo'
             ]
@@ -70,12 +79,13 @@ class PersonneDisparueAdmin(admin.ModelAdmin):
                 'signes_particuliers'
             ]
         }),
-        ('Circonstances', {
+        ('Circonstances & Contact', {
             'fields': [
                 'date_disparition',
                 'heure_disparition',
                 'region',
                 'ville',
+                'telephone_contact',
                 'vetements',
                 'description'
             ]
