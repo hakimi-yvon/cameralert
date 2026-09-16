@@ -1,30 +1,44 @@
 {% extends 'base.html' %}
 
-{% block titre %}Accueil — CamerAlert | Plateforme Nationale des Disparus{% endblock %}
+{% block titre %}CamerAlert — Plateforme Nationale de Recherche de Personnes Disparues au Cameroun{% endblock %}
 
 {% block contenu %}
 
-<!-- Hero section -->
+<!-- Hero Section Haute Définition -->
 <div class="hero-section">
     <div class="container text-center">
-        <h1>Aide à retrouver les disparus<br>du Cameroun</h1>
-        <p>
-            Signalez, diffusez et mobilisez les communautés pour retrouver rapidement nos proches partout au Cameroun.
+
+        <div class="hero-badge-live">
+            <span class="pulse-dot"></span> Système National d'Alerte Actif · Cameroun
+        </div>
+
+        <h1>
+            Chaque minute compte.<br>
+            <span class="gradient-text">Retrouvons nos proches ensemble.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+            Signalez une disparition en quelques instants, mobilisez les réseaux citoyens et diffusez les avis de recherche dans toutes les localités du pays.
         </p>
 
+        <!-- Barre de recherche moderne -->
         <form action="{% url 'liste_cas' %}" method="GET" class="search-wrapper">
-            <input type="text" name="q"
-                   class="form-control"
-                   placeholder="Rechercher par nom, prénom, ville, région...">
-            <button class="btn btn-danger px-4" type="submit">
-                Rechercher
-            </button>
+            <div class="search-inner-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="text-secondary me-2 flex-shrink-0" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+                <input type="text" name="q" placeholder="Rechercher par nom, prénom, ville, région..." autocomplete="off">
+                <button class="btn btn-danger px-4 py-2" type="submit">
+                    Rechercher
+                </button>
+            </div>
         </form>
 
+        <!-- Cartes statistiques KPI -->
         <div class="stats-hero">
             <div class="stat-item">
                 <div class="stat-number">{{ total_actifs }}</div>
-                <div class="stat-label">Cas en recherche</div>
+                <div class="stat-label">Avis de recherche actifs</div>
             </div>
             <div class="stat-item">
                 <div class="stat-number">{{ total_retrouves }}</div>
@@ -35,28 +49,32 @@
                 <div class="stat-label">Régions Couvertes</div>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- Cas récents -->
+<!-- Section Signalements Récents -->
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
         <div>
-            <div class="section-title">Signalements récents</div>
-            <div class="section-subtitle">
-                Les derniers avis de recherche publiés et validés sur la plateforme
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="fs-5">🚨</span>
+                <h3 class="fw-bold mb-0">Derniers avis de recherche publiés</h3>
             </div>
+            <p class="text-muted small mb-0">
+                Chaque signalement ci-dessous a été vérifié et nécessite la vigilance de tous.
+            </p>
         </div>
-        <a href="{% url 'liste_cas' %}" class="btn btn-outline-danger btn-sm">
-            Voir tous les cas ({{ total_actifs }}) →
+        <a href="{% url 'liste_cas' %}" class="btn btn-outline-danger btn-sm px-3 py-2 fw-semibold">
+            Voir tous les cas actifs ({{ total_actifs }}) →
         </a>
     </div>
 
     <div class="row g-4">
         {% for cas in cas_recents %}
-        <div class="col-12 col-sm-6 col-lg-4 animate-in">
+        <div class="col-12 col-sm-6 col-lg-4">
             <a href="{% url 'detail_cas' cas.pk %}" class="text-decoration-none">
-                <div class="card card-disparu h-100">
+                <div class="card card-disparu">
                     <div class="card-photo-wrapper">
                         {% if cas.photo %}
                             <img src="{{ cas.photo.url }}" alt="{{ cas.prenom }} {{ cas.nom }}" loading="lazy">
@@ -67,6 +85,7 @@
                             </div>
                         {% endif %}
 
+                        <!-- Badge Catégorie -->
                         <div class="card-photo-overlay-tag">
                             {% if cas.categorie == 'enfant' %}
                                 <span class="badge-cat badge-cat-enfant">👶 Enfant</span>
@@ -81,25 +100,29 @@
                             {% endif %}
                         </div>
 
+                        <!-- Tag Date de disparition -->
                         <div class="card-photo-date-tag">
                             <span>📅 Disparu(e) le {{ cas.date_disparition|date:"d/m/Y" }}</span>
                         </div>
                     </div>
 
                     <div class="card-body">
-                        <div class="card-name">
+                        <div class="card-name text-truncate">
                             {{ cas.prenom }} {{ cas.nom }}
                         </div>
-                        <div class="card-location">
+                        <div class="card-location text-truncate">
                             📍 <strong>{{ cas.region }}</strong> · {{ cas.ville }}
                         </div>
                         <div class="card-meta-row">
                             <span>{{ cas.age }} ans</span> · 
                             <span>{{ cas.get_sexe_display }}</span>
                         </div>
-                        <div class="mt-auto pt-2 d-flex justify-content-between align-items-center border-top">
-                            <span class="text-muted small">Réf: {{ cas.reference|default:"CA-2026" }}</span>
-                            <span class="text-danger fw-semibold small">Voir la fiche →</span>
+
+                        <div class="mt-auto pt-3 d-flex justify-content-between align-items-center border-top">
+                            <span class="text-muted small fw-medium">Réf: {{ cas.reference|default:"CA-2026" }}</span>
+                            <span class="text-danger fw-bold small d-flex align-items-center gap-1">
+                                Consulter la fiche →
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -107,51 +130,80 @@
         </div>
         {% empty %}
         <div class="col-12 text-center py-5">
-            <div class="p-5 bg-card rounded-4 border">
+            <div class="card shadow-sm p-5 border-0 rounded-4 text-center">
                 <div class="fs-1 mb-2">🔍</div>
-                <h5 class="fw-bold">Aucun cas actif pour le moment</h5>
-                <p class="text-muted small">Tous les signalements enregistrés sont actuellement résolus ou en attente.</p>
+                <h4 class="fw-bold mb-1">Aucun cas actif actuellement</h4>
+                <p class="text-muted small mb-0">Tous les avis de recherche enregistrés ont été résolus avec succès.</p>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
 
-<!-- Section Guide Citoyen -->
-<div class="container py-4 border-top">
-    <div class="text-center max-w-700 mx-auto mb-4">
-        <h3 class="section-title">Que faire en cas de disparition d'un proche ?</h3>
-        <p class="section-subtitle">Les premières heures sont décisives. Voici les réflexes à adopter immédiatement.</p>
+<!-- Section Guide Réflexe en Cas de Disparition -->
+<div class="container py-5 border-top">
+    <div class="text-center max-w-700 mx-auto mb-5" style="max-width:640px;">
+        <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold small text-uppercase mb-2">
+            Protocole d'urgence
+        </span>
+        <h3 class="fw-bold mb-2">Que faire en cas de disparition d'un proche ?</h3>
+        <p class="text-muted small">Les premières 24 à 48 heures sont vitales. Suivez ces 3 étapes sans attendre.</p>
     </div>
 
     <div class="row g-4">
         <div class="col-md-4">
-            <div class="guide-card">
-                <div class="guide-icon">1</div>
-                <h5 class="fw-bold mb-2">Alerter les forces de l'ordre</h5>
+            <div class="card h-100 p-4 border-0 shadow-sm rounded-4" style="background:var(--bg-card);">
+                <div class="d-inline-flex align-items-center justify-content-center bg-danger text-white rounded-3 fw-bold fs-5 mb-3" style="width:42px; height:42px;">
+                    1
+                </div>
+                <h5 class="fw-bold mb-2">Alerter les forces de sécurité</h5>
                 <p class="text-muted small mb-0">
-                    Rendez-vous immédiatement au commissariat ou à la brigade de gendarmerie la plus proche, ou composez le <strong>117</strong> ou <strong>1500</strong>.
+                    Rendez-vous immédiatement dans la brigade ou le commissariat le plus proche. Composez le <strong>117 (Police)</strong> ou le <strong>1500 (Gendarmerie)</strong>.
                 </p>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="guide-card">
-                <div class="guide-icon">2</div>
+            <div class="card h-100 p-4 border-0 shadow-sm rounded-4" style="background:var(--bg-card);">
+                <div class="d-inline-flex align-items-center justify-content-center bg-danger text-white rounded-3 fw-bold fs-5 mb-3" style="width:42px; height:42px;">
+                    2
+                </div>
                 <h5 class="fw-bold mb-2">Publier sur CamerAlert</h5>
                 <p class="text-muted small mb-0">
-                    Créez un signalement avec une photo récente et une description précise des vêtements pour mobiliser le public et les réseaux.
+                    Remplissez la fiche avec une photo nette et récente, la description vestimentaire et vos coordonnées d'urgence pour validation prioritaire.
                 </p>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="guide-card">
-                <div class="guide-icon">3</div>
+            <div class="card h-100 p-4 border-0 shadow-sm rounded-4" style="background:var(--bg-card);">
+                <div class="d-inline-flex align-items-center justify-content-center bg-danger text-white rounded-3 fw-bold fs-5 mb-3" style="width:42px; height:42px;">
+                    3
+                </div>
                 <h5 class="fw-bold mb-2">Partager massivement</h5>
                 <p class="text-muted small mb-0">
-                    Utilisez les boutons de partage WhatsApp et réseaux sociaux pour faire circuler l'avis de recherche dans les groupes locaux.
+                    Téléchargez l'affiche officielle A4 et utilisez le bouton WhatsApp pour diffuser le signalement dans les groupes de quartier et de famille.
                 </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bannière d'Appel à l'Action Citoyenne -->
+<div class="container pb-5">
+    <div class="card p-5 border-0 rounded-4 text-white text-center shadow-lg position-relative overflow-hidden" style="background: linear-gradient(135deg, #B91C1C 0%, #DC2626 50%, #EF4444 100%);">
+        <div class="position-relative" style="z-index:2; max-width:650px; margin:0 auto;">
+            <h3 class="fw-bold mb-2">Vous cherchez un proche porté disparu ?</h3>
+            <p class="text-white-50 mb-4">
+                Ne restez pas isolé face à l'angoisse. Déposez un signalement gratuitement et activez la solidarité citoyenne camerounaise dès maintenant.
+            </p>
+            <div class="d-flex justify-content-center flex-wrap gap-3">
+                <a href="{% url 'signaler' %}" class="btn btn-light px-4 py-2 fw-bold text-danger">
+                    + Déposer un signalement gratuit
+                </a>
+                <a href="{% url 'liste_cas' %}" class="btn btn-outline-light px-4 py-2 fw-semibold">
+                    Consulter tous les avis de recherche
+                </a>
             </div>
         </div>
     </div>

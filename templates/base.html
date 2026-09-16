@@ -1,40 +1,58 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block titre %}CamerAlert — Plateforme Citoyenne de Signalement{% endblock %}</title>
-    <meta name="description" content="Plateforme nationale d'alerte et de recherche de personnes disparues au Cameroun.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>{% block titre %}CamerAlert — Plateforme Nationale de Recherche de Personnes Disparues{% endblock %}</title>
+    <meta name="description" content="Plateforme nationale citoyenne d'alerte et de recherche de personnes disparues au Cameroun. Signalez, mobilisez et retrouvez nos proches.">
+
+    <!-- Typographies Modernes Haute Définition -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 & CSS CamerAlert Design System -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v={% now 'U' %}">
+
     {% block extra_meta %}{% endblock %}
 </head>
 <body>
 
-<!-- Bandeau d'assistance d'urgence officiel -->
+<!-- Bandeau officiel d'assistance et d'urgence -->
 <div class="emergency-top-bar">
     <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div>
-            <span>🚨 <strong>Numéros d'urgence :</strong></span>
-            <span class="ms-2">Police : <a href="tel:117">117</a></span>
-            <span class="ms-3">Gendarmerie : <a href="tel:1500">1500</a> / <a href="tel:113">113</a></span>
-            <span class="ms-3 d-none d-sm-inline">SAMU : <a href="tel:119">119</a></span>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <span class="emergency-pill">
+                <span class="pulse-dot"></span> URGENCE 24/7
+            </span>
+            <span class="d-none d-md-inline text-white-50 ms-1">Numéros nationaux :</span>
+            <span>Police : <a href="tel:117" class="hotline-link">117</a></span>
+            <span>Gendarmerie : <a href="tel:1500" class="hotline-link">1500</a> / <a href="tel:113" class="hotline-link">113</a></span>
+            <span class="d-none d-sm-inline">SAMU : <a href="tel:119" class="hotline-link">119</a></span>
         </div>
-        <div class="d-none d-md-block text-white-50">
-            Plateforme Citoyenne Nationale · Cameroun 🇨🇲
+        <div class="d-none d-lg-flex align-items-center gap-2 text-white-50 small">
+            <span>🇨🇲 République du Cameroun</span>
+            <span>·</span>
+            <span>Coordination Citoyenne</span>
         </div>
     </div>
 </div>
 
-<!-- Navigation principale -->
+<!-- Navigation principale en verre dépoli -->
 <nav class="navbar navbar-expand-lg">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'accueil' %}">
-            <span class="logo-dot"></span>CamerAlert
+        <a class="navbar-brand" href="{% url 'accueil' %}">
+            <span class="brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                </svg>
+            </span>
+            <span>Camer<span style="color:var(--rouge-500);">Alert</span></span>
         </a>
-        <button class="navbar-toggler" type="button"
+
+        <button class="navbar-toggler border-0 p-1" type="button"
                 data-bs-toggle="collapse"
                 data-bs-target="#navMenu"
                 aria-controls="navMenu"
@@ -42,8 +60,9 @@
                 aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navMenu">
-            <ul class="navbar-nav me-auto ps-lg-3">
+            <ul class="navbar-nav me-auto ps-lg-3 gap-1">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'accueil' %}">
                         Accueil
@@ -51,24 +70,25 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'liste_cas' %}">
-                        Tous les cas
+                        Avis de recherche
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'carte' %}">
-                        🗺️ Carte des régions
+                        🗺️ Carte interactive
                     </a>
                 </li>
             </ul>
-            <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+
+            <div class="d-flex align-items-center flex-wrap gap-2 mt-3 mt-lg-0">
 
                 <!-- Bouton mode clair/sombre -->
-                <button class="btn-theme" id="btn-theme" title="Changer le thème">
+                <button class="btn-theme" id="btn-theme" title="Changer le thème (Clair / Sombre)">
                     🌙
                 </button>
 
                 {% if user.is_authenticated %}
-                    <a class="nav-link" href="{% url 'mes_signalements' %}">
+                    <a class="nav-link fw-semibold text-truncate" href="{% url 'mes_signalements' %}" style="max-width:180px;">
                         📋 Mes signalements
                     </a>
                     {% if user.is_staff %}
@@ -92,67 +112,116 @@
                 {% endif %}
 
                 <a class="btn btn-danger btn-sm" href="{% url 'signaler' %}">
-                    + Signaler une disparition
+                    <span>+ Signaler une disparition</span>
                 </a>
             </div>
         </div>
     </div>
 </nav>
 
+<!-- Messages flash contextuels -->
 {% if messages %}
     <div class="container mt-3">
         {% for message in messages %}
-            <div class="alert alert-dismissible fade show shadow-sm
+            <div class="alert alert-dismissible fade show shadow-sm border-0 rounded-3
                 {% if message.tags == 'success' %}alert-success
                 {% elif message.tags == 'warning' %}alert-warning
                 {% elif message.tags == 'error' or message.tags == 'danger' %}alert-danger
                 {% else %}alert-info{% endif %}">
-                {{ message }}
+                <div class="d-flex align-items-center gap-2">
+                    {% if message.tags == 'success' %}<span>✅</span>
+                    {% elif message.tags == 'warning' %}<span>⚠️</span>
+                    {% elif message.tags == 'error' or message.tags == 'danger' %}<span>🚨</span>
+                    {% else %}<span>ℹ️</span>{% endif %}
+                    <div>{{ message }}</div>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endfor %}
     </div>
 {% endif %}
 
+<!-- Contenu principal -->
 <main>{% block contenu %}{% endblock %}</main>
 
+<!-- Pied de page pro -->
 <footer>
     <div class="container">
-        <div class="mb-2 fw-semibold">CamerAlert — Plateforme nationale de signalement et de recherche de personnes disparues</div>
-        <div class="text-secondary small mb-3">En cas de disparition immédiate d'un proche, contactez en priorité les forces de sécurité (117 / 1500).</div>
-        <div class="text-muted small">© {% now "Y" %} CamerAlert · Tous droits réservés</div>
+        <div class="row g-4 mb-4">
+            <div class="col-lg-5 col-md-6">
+                <div class="navbar-brand mb-2">
+                    <span class="brand-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                        </svg>
+                    </span>
+                    <span>Camer<span style="color:var(--rouge-500);">Alert</span></span>
+                </div>
+                <p class="small text-muted pe-lg-4 mb-3">
+                    Plateforme nationale indépendante et citoyenne dédiée à l'accélération de la recherche de personnes disparues à travers les 10 régions du Cameroun.
+                </p>
+                <div class="small fw-semibold text-danger">
+                    🚨 En cas d'urgence immédiate : composez le 117 (Police) ou le 1500 (Gendarmerie).
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-6">
+                <h6 class="fw-bold mb-3">Accès rapide</h6>
+                <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+                    <li><a href="{% url 'accueil' %}" class="text-secondary text-decoration-none">Accueil</a></li>
+                    <li><a href="{% url 'liste_cas' %}" class="text-secondary text-decoration-none">Avis de recherche actifs</a></li>
+                    <li><a href="{% url 'carte' %}" class="text-secondary text-decoration-none">Carte interactive</a></li>
+                    <li><a href="{% url 'signaler' %}" class="text-secondary text-decoration-none">Signaler une disparition</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-3 col-6">
+                <h6 class="fw-bold mb-3">Sécurité & Numéros Utiles</h6>
+                <ul class="list-unstyled small d-flex flex-column gap-2 mb-0 text-muted">
+                    <li>Police Secours : <strong>117</strong></li>
+                    <li>Gendarmerie Nationale : <strong>1500 / 113</strong></li>
+                    <li>SAMU / Urgences médicales : <strong>119</strong></li>
+                    <li>Sapeurs-Pompiers : <strong>118</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 small text-muted">
+            <div>© {% now "Y" %} CamerAlert · Plateforme Citoyenne du Cameroun. Tous droits réservés.</div>
+            <div>Sauvons des vies ensemble.</div>
+        </div>
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ===== GESTION DU MODE CLAIR / SOMBRE =====
-    const btn = document.getElementById('btn-theme');
-    const body = document.body;
+    // ===== GESTION FLUIDE DU THÈME CLAIR / SOMBRE =====
+    const themeBtn = document.getElementById('btn-theme');
+    const rootHtml = document.documentElement;
 
-    const themeSauvegarde = localStorage.getItem('theme');
-    if (themeSauvegarde === 'dark') {
-        body.classList.add('dark-mode');
-        document.documentElement.setAttribute('data-bs-theme', 'dark');
-        btn.textContent = '☀️';
-    } else {
-        document.documentElement.setAttribute('data-bs-theme', 'light');
-        btn.textContent = '🌙';
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            rootHtml.setAttribute('data-bs-theme', 'dark');
+            themeBtn.textContent = '☀️';
+        } else {
+            document.body.classList.remove('dark-mode');
+            rootHtml.setAttribute('data-bs-theme', 'light');
+            themeBtn.textContent = '🌙';
+        }
     }
 
-    btn.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
+    const savedTheme = localStorage.getItem('theme') ||
+        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
-        if (body.classList.contains('dark-mode')) {
-            localStorage.setItem('theme', 'dark');
-            document.documentElement.setAttribute('data-bs-theme', 'dark');
-            btn.textContent = '☀️';
-        } else {
-            localStorage.setItem('theme', 'light');
-            document.documentElement.setAttribute('data-bs-theme', 'light');
-            btn.textContent = '🌙';
-        }
+    applyTheme(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+        const isDark = document.body.classList.contains('dark-mode');
+        const nextTheme = isDark ? 'light' : 'dark';
+        localStorage.setItem('theme', nextTheme);
+        applyTheme(nextTheme);
     });
 </script>
 
