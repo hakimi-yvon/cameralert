@@ -812,6 +812,18 @@ form textarea:focus {
     box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;
 }
 
+/* Fix Bootstrap input-group alignment */
+.input-group > input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="file"]) {
+    width: 1% !important;
+    flex: 1 1 auto !important;
+}
+.input-group > .input-group-text {
+    border: 1.5px solid var(--bord) !important;
+    background-color: var(--bg-input) !important;
+    color: var(--texte-secondaire) !important;
+    border-radius: 10px 0 0 10px !important;
+}
+
 /* Zone d'upload photo */
 .image-preview-box {
     border: 2px dashed var(--bord-hover);

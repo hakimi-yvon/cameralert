@@ -24,15 +24,21 @@
     <!-- Barre de filtres moderne et ergonomique -->
     <div class="card shadow-sm p-3 mb-4 border-0" style="border-radius:18px; background:var(--bg-card);">
         <form method="GET" class="row g-2 align-items-center">
+            <!-- Champ recherche textuelle avec icône intégrée -->
             <div class="col-lg-4 col-md-12">
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0 text-muted">🔍</span>
+                <div class="position-relative">
+                    <span class="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="pointer-events: none; z-index: 2; font-size: 14px;">
+                        🔍
+                    </span>
                     <input type="text" name="q" value="{{ recherche|default:'' }}"
-                           class="form-control border-start-0 ps-0" placeholder="Nom, prénom, ville...">
+                           class="form-control" placeholder="Nom, prénom, ville..."
+                           style="padding-left: 2.4rem !important; height: 46px; border-radius: 12px;">
                 </div>
             </div>
+
+            <!-- Régions -->
             <div class="col-lg-3 col-md-4 col-sm-6">
-                <select name="region" class="form-select">
+                <select name="region" class="form-select" style="height: 46px; border-radius: 12px;">
                     <option value="">Toutes les régions (10)</option>
                     <option value="Centre" {% if region == 'Centre' %}selected{% endif %}>Centre</option>
                     <option value="Littoral" {% if region == 'Littoral' %}selected{% endif %}>Littoral</option>
@@ -46,8 +52,10 @@
                     <option value="Sud Ouest" {% if region == 'Sud Ouest' or region == 'Sud-Ouest' %}selected{% endif %}>Sud-Ouest</option>
                 </select>
             </div>
+
+            <!-- Catégories -->
             <div class="col-lg-2 col-md-4 col-sm-6">
-                <select name="categorie" class="form-select">
+                <select name="categorie" class="form-select" style="height: 46px; border-radius: 12px;">
                     <option value="">Toutes catégories</option>
                     <option value="enfant" {% if categorie == 'enfant' %}selected{% endif %}>👶 Enfant</option>
                     <option value="femme" {% if categorie == 'femme' %}selected{% endif %}>👩 Femme</option>
@@ -55,18 +63,22 @@
                     <option value="personne_agee" {% if categorie == 'personne_agee' %}selected{% endif %}>👵 Personne âgée</option>
                 </select>
             </div>
+
+            <!-- Tri -->
             <div class="col-lg-2 col-md-4 col-sm-6">
-                <select name="tri" class="form-select">
+                <select name="tri" class="form-select" style="height: 46px; border-radius: 12px;">
                     <option value="recent" {% if tri == 'recent' or not tri %}selected{% endif %}>Plus récents</option>
                     <option value="ancien" {% if tri == 'ancien' %}selected{% endif %}>Plus anciens</option>
                 </select>
             </div>
+
+            <!-- Actions -->
             <div class="col-lg-1 col-md-12 col-sm-6 d-flex gap-2">
-                <button class="btn btn-danger w-100 py-2" type="submit" title="Appliquer les filtres">
+                <button class="btn btn-danger w-100 fw-bold d-flex align-items-center justify-content-center" type="submit" title="Appliquer les filtres" style="height: 46px; border-radius: 12px;">
                     Filtrer
                 </button>
                 {% if recherche or region or categorie or tri %}
-                <a href="{% url 'liste_cas' %}" class="btn btn-outline-secondary py-2" title="Réinitialiser">
+                <a href="{% url 'liste_cas' %}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center px-3" title="Réinitialiser les filtres" style="height: 46px; border-radius: 12px;">
                     ↺
                 </a>
                 {% endif %}
