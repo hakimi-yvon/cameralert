@@ -21,11 +21,15 @@ DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
 # Allowed hosts configuration
 hosts_env = os.environ.get("ALLOWED_HOSTS", "*")
 ALLOWED_HOSTS = [h.strip() for h in hosts_env.split(",") if h.strip()]
+if ".vercel.app" not in ALLOWED_HOSTS and "*" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(".vercel.app")
 
 # CSRF Trusted Origins for deployments (Render, Vercel, etc.)
 csrf_trusted_origins_env = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
 if csrf_trusted_origins_env:
     CSRF_TRUSTED_ORIGINS = [o.strip() for o in csrf_trusted_origins_env.split(",") if o.strip()]
+    if "https://*.vercel.app" not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append("https://*.vercel.app")
 else:
     CSRF_TRUSTED_ORIGINS = [
         "https://*.onrender.com",
@@ -93,10 +97,12 @@ if DATABASE_URL:
         )
     }
 else:
+    # On Vercel serverless, the repository filesystem is read-only at runtime except /tmp
+    db_path = Path('/tmp/db.sqlite3') if os.environ.get('VERCEL') else BASE_DIR / 'db.sqlite3'
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': db_path,
         }
     }
 

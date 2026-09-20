@@ -1,6 +1,15 @@
+"""
+Vercel Serverless Function entry point.
+"""
 import os
-from django.core.wsgi import get_wsgi_application
+import sys
+from pathlib import Path
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cameralert.settings")
+# Ensure project root is in sys.path
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
-app = get_wsgi_application()
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cameralert.settings')
+
+from cameralert.wsgi import app
